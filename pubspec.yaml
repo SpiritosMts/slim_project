@@ -1,0 +1,85 @@
+name: smart_care
+description: A new Flutter project.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.5.0+2
+
+environment:
+  sdk: '>=2.19.6 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cloud_firestore: any
+
+  responsive_sizer: ^3.1.0
+  easy_search_bar: ^2.3.1 #filter search
+  flutter_native_splash: any # splash screen when open app $flutter pub run flutter_native_splash:createflutter pub run flutter_native_splash:create / if_err:$flutter pub pub run flutter_native_splash:create
+  flutter_launcher_icons: ^0.12.0 #for app icon run: $flutter pub run flutter_launcher_icons
+  introduction_screen: ^3.1.4
+
+  url_launcher: ^6.1.10
+  google_fonts: any
+  flutter_animated_dialog: ^2.0.1
+  permission_handler: any
+
+  http: any
+  get: any
+  intl: any
+  expansion_tile_card: ^2.0.0 # for cards
+  substring_highlight: ^1.0.33
+  shared_preferences: ^2.0.18
+  awesome_dialog: ^3.0.2
+  #collection: ^1.16.0
+  #syncfusion_flutter_datepicker: "20.4.44"
+  vibration: ^1.7.6
+  #tutorial_coach_mark: ^1.2.4
+  ionicons: ^0.2.2 #icons
+
+  path_provider: ^2.0.14
+  image_picker: ^0.8.7+1
+  cupertino_icons: ^1.0.2
+  chat_bubbles: any
+  fluttertoast: any
+  #firebase_core: ^2.1.1
+  firebase_database: any
+  firebase_auth: any
+  loading_indicator: ^3.1.0
+  google_sign_in: ^6.0.2
+  firebase_storage: any
+  firebase_crashlytics: any
+  animated_text_kit: any
+  firebase_analytics: any
+  change_app_package_name: ^1.1.0
+  settings_ui: ^2.0.2
+  bottom_bar_with_sheet: ^2.4.0
+  persistent_bottom_nav_bar_v2: ^4.2.8
+  fl_chart: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  flutter_native_splash: any
+
+
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"
+
+
+flutter_native_splash:
+  color: "#006064"
+  image: assets/images/logo.png
+  fullscreen: true
+  andoid: true
+  ios: true
+
+
+flutter:
+  assets:
+    - assets/images/
+  uses-material-design: true
