@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:smart_care/chart_live_history/chart_live_history.dart';
 import 'package:smart_care/manager/styles.dart';
+import 'package:smart_care/models/user.dart';
 
 import '../../manager/myUi.dart';
 import '../../manager/myVoids.dart';
@@ -20,40 +22,6 @@ class PatientChart extends StatefulWidget {
 class _PatientChartState extends State<PatientChart> {
 
   final DoctorHomeCtr gc = Get.put<DoctorHomeCtr>(DoctorHomeCtr());
-  SideTitles get bottomTitles => SideTitles(
-    interval: 1,
-    showTitles: true,
-    getTitlesWidget: (value, meta) {
-      String bottomText = '';
-
-      //print('## ${value.toInt()}');
-
-      //bool isDivisibleBy15 = ((value.toInt() % 13 == 0) );
-      DateTime newDateTime = gc.startDateTime.add(Duration(seconds: value.toInt()));
-      //bottomText = DateFormat('mm:ss').format(newDateTime);
-      //bottomText = (value.toInt() ).toString();
-
-      switch (value.toInt() % 7 ) {
-
-        case 0:
-          bottomText = DateFormat('HH:mm:ss').format(newDateTime);
-          break;
-
-      }
-
-      return Padding(
-        padding: const EdgeInsets.only(top: 5.0),
-        child: Text(
-          bottomText,
-          maxLines: 1,
-
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 11,color:chartValuesColor),
-        ),
-      );
-
-    },
-  );
 
   Widget prop({IconData? icon,String? title,String? value}){
     return    Row(
@@ -83,17 +51,17 @@ class _PatientChartState extends State<PatientChart> {
       appBar: AppBar(
 
         //centerTitle: dcCtr.myPatients.isNotEmpty? false:true,
-        automaticallyImplyLeading: false,
-
+        automaticallyImplyLeading:false,
+        elevation: 10,
         backgroundColor: appbarColor,
         title:  Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: GetBuilder<DoctorHomeCtr>(
               id:'appBar',
               builder: (_) {
-                if(showLiveTime){
-                return  Text('${  DateFormat('HH:mm:ss').format(DateTime.now())}');
-                }
+                // if(showLiveTime){
+                // return  Text('${  DateFormat('HH:mm:ss').format(DateTime.now())}');
+                // }
                return  Text('smartCare', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
                 textStyle:  TextStyle(
                 fontSize: 23  ,
@@ -107,8 +75,8 @@ class _PatientChartState extends State<PatientChart> {
         actions:<Widget>[
           GetBuilder<DoctorHomeCtr>(
               id:'appBar',
-              builder: (_) {
-                return dcCtr.myPatients.isNotEmpty?  Padding(
+              builder: (g) {
+                return dcCtr.myPatientsMap.isNotEmpty?  Padding(
                   padding: const EdgeInsets.only(top: 5.0),
                   child: DropdownButton<String>(
                     icon: Icon(Icons.arrow_drop_down, color: Colors.white),
@@ -116,10 +84,14 @@ class _PatientChartState extends State<PatientChart> {
                     dropdownColor: primaryColor,
                    // value:(gc.selectedServer!='' && dcCtr.myPatients.isNotEmpty)? dcCtr.myPatients[gc.selectedServer]!.name : 'no patients',
                     value:gc.selectedServer,
-                    items: dcCtr.myPatients.isNotEmpty? gc.servers.map((String value) {
-                      String patName =dcCtr.myPatients[value]!.name!;
+                    items:authCtr.cUser.patients.map((String id) {
+                      // ScUser? pat = dcCtr.myPatients[id];
+                       String patName = dcCtr.myPatientsMap[id]!.name!;
+                      //printUser(pat);
+                     // print('## selected pat_ID: <${id}>');
+                      //print('## selected pat_name: <${patName}>');
                       return DropdownMenuItem<String>(
-                        value: value,
+                        value: id,
                         child:  Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -130,7 +102,7 @@ class _PatientChartState extends State<PatientChart> {
                           ],
                         ),
                       );
-                    }).toList():null,
+                    }).toList(),
                     onChanged: (newValue) {
                       gc.changeServer(newValue);
                     },
@@ -141,102 +113,7 @@ class _PatientChartState extends State<PatientChart> {
         ],
       ),
       body: backGroundTemplate(
-        child: GetBuilder<DoctorHomeCtr>(
-            id: 'chart',
-            builder: (_) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5.0),
-                child: gc.selectedServer != null ? gc.selectedServer != ''?
-                Stack(
-                  children: [
-                    SingleChildScrollView(
-                      child: Column(
-                        //shrinkWrap: true,
-                        //mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          chartGraph(
-                           flSpots:  gc.generateSpots(gc.bpmDataPts),
-                           dataList:  gc.bpmDataPts,//double
-                           dataName:  'bpm',
-                           dataType:  gc.bpm_data,
-                           width: 100.w,
-                           minVal:  getDoubleMinValue(gc.bpmDataPts).toInt() -15.0,
-                           maxVal:  getDoubleMaxValue(gc.bpmDataPts).toInt() +15.0,
-                              bottomTitles: bottomTitles
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 15.0,top: 28),
-                            child: Column(
-                              children: [
-                                prop(
-                                  icon: Icons.timer_outlined,
-                                  title: 'Time'.tr,
-                                  value: '${  DateFormat('HH:mm:ss').format(DateTime.now())}',
-                                ),
-                                SizedBox(height: 15,),
-
-                                prop(
-                                  icon: Icons.upload,
-                                  title: 'Max Safe'.tr,
-                                  value: dcCtr.maxRange.toString(),
-                                ),
-                                SizedBox(height: 15,),
-
-                                prop(
-                                  icon: Icons.download_rounded,
-                                  title: 'Min Safe'.tr,
-                                  value: dcCtr.minRange.toString(),
-                                ),
-
-
-
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-
-                      child:   Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          width: 150,
-                          height: 40,
-                          child: FloatingActionButton.extended(
-                            onPressed: _toggleConnection,
-                            icon: Icon(size: 16,
-                              _isConnected ? Icons.check_circle : Icons.error,
-                              color: Colors.white,
-                            ),
-                            label: Text(
-                              _isConnected ? 'Connected' : 'Disconnected',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                              ),
-                            ),
-                            backgroundColor: _isConnected ? Colors.green : Colors.red,
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ):Center(
-                  child: Text(
-                    'no server selected',
-                    style: TextStyle(
-                        fontSize: 17
-                    ),
-                  ),
-                ):Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-        ),
+        child: LiveHisChart(),
       ),
     );
     return GetBuilder<DoctorHomeCtr>(

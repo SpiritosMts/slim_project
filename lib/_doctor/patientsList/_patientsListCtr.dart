@@ -12,7 +12,6 @@ import '../../manager/myVoids.dart';
 
 class PatientsListCtr extends GetxController {
 
-  List<dynamic> patientsIDsStr=authCtr.cUser.patients!;
 
 
 @override
@@ -39,6 +38,8 @@ void onInit() {
 
 
   getUsersData({bool printDet = false}) async {
+    shouldLoad=true;
+
     if (printDet) print('## downloading users from fireBase...');
     List<DocumentSnapshot> usersData = await getDocumentsByColl(usersColl
             .where('role', isEqualTo: 'patient')//filter only patients
@@ -99,7 +100,6 @@ void onInit() {
     //remove doctor to patient
     updateDoc(usersColl, patID, {'doctorAttachedID': ''});
     //refresh curr user
-    //authCtr.refreshCuser();
     authCtr.refreshCuser();///refresh
 
     //Get.back();

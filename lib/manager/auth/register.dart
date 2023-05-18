@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:smart_care/manager/auth/login.dart';
 import 'package:smart_care/manager/auth/verifyEmail.dart';
 import 'package:smart_care/manager/firebaseVoids.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -78,9 +79,20 @@ class _RegisterState extends State<Register> {
 
     };
 
+
       if(gglMap['gglEmail']!=''){
         /// add user to cloud
-        addDocument(fieldsMap: addUserMap, collName: usersCollName).then((value) {
+        addDocument(
+          fieldsMap: addUserMap,
+            collName: usersCollName,
+          addID: true,
+          addRealTime: true,
+          docPathRealtime: 'patients',
+          realtimeMap: {
+            "bpm_once": 0,
+          },
+        ).then((value) {
+
           Get.back();//hide loading
           Future.delayed(const Duration(milliseconds: 3000), () async {
               await authCtr.getUserInfoByEmail(gglMap['gglEmail']).then((value) {
@@ -94,7 +106,7 @@ class _RegisterState extends State<Register> {
           /// add user to cloud
           addDocument(fieldsMap: addUserMap, collName: usersCollName).then((value) {
             Get.back();//hide loading
-            Get.offAll(() => VerifyScreen());
+            verifyAnyCreatedAccount? Get.offAll(() => VerifyScreen()):Get.offAll(() => Login()) ;
 
 
             showSuccess(sucText: 'your account has been created successfully'.tr);

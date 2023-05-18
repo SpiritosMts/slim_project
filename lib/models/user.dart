@@ -1,6 +1,8 @@
 
 
 
+import '../manager/myVoids.dart';
+
 class ScUser {
 
   String? id;
@@ -20,13 +22,13 @@ class ScUser {
   Map<String,dynamic> notifications;
   String? doctorAttachedID;
   bool verified;
-  List? patients;
+  List<String> patients;
 
 
 
 
   ScUser({
-    this.id = '',
+    this.id = 'no-id',
     this.email = '',
     this.pwd  = '',
     this.name = '',
@@ -42,14 +44,19 @@ class ScUser {
     this.hasPatients = false,//doc
     this.appointments = const{},//doc
     this.speciality = '',//doc
-    this.patients = const [],//doc
+    this.patients =const [],//doc
 
     this.health = const{},//pat
     this.doctorAttachedID = '',//pat
   });
 }
 
-
+Future<ScUser> getUserByID(id) async {
+  if(id == '') return ScUser();
+  final event = await usersColl.where('id', isEqualTo: id).get();
+  var doc = event.docs.single;
+  return ScUserFromMap(doc);
+}
 ScUser ScUserFromMap(userDoc){
 
   ScUser user =ScUser();
@@ -70,10 +77,18 @@ ScUser ScUserFromMap(userDoc){
   user.role = userDoc.get('role');
   user.verified = userDoc.get('verified');
   user.joinDate = userDoc.get('joinDate');
-  user.patients = userDoc.get('patients');
+
+  List<dynamic> fbList = userDoc.get('patients');
+  List<String> fbListString =  [];
+  for (var id in fbList) {
+    //print('## type ${id}');
+    fbListString.add(id.toString());
+  }
+  user.patients = fbListString;
+
   user.appointments = userDoc.get('appointments');
   user.notifications = userDoc.get('notifications');
-  user.hasPatients = user.patients!.isNotEmpty;
+  user.hasPatients = user.patients.isNotEmpty;
 
 
   return user;

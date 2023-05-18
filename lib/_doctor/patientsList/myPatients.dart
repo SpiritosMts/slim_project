@@ -3,12 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:smart_care/_doctor/home/doctorHome_ctr.dart';
 import 'package:smart_care/_doctor/patientsList/_patientsListCtr.dart';
 import 'package:smart_care/manager/myUi.dart';
 import 'package:smart_care/manager/styles.dart';
 
 import '../../manager/myVoids.dart';
 import 'allPatients.dart';
+import 'package:badges/badges.dart' as badges;
 
 class MyPatients extends StatefulWidget {
   const MyPatients({Key? key}) : super(key: key);
@@ -24,36 +27,47 @@ class _MyPatientsState extends State<MyPatients> {
   @override
   Widget build(BuildContext context) {
 
-
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: Text("My Patients"),
         automaticallyImplyLeading:false,
-       centerTitle: true,
+        centerTitle: true,
         backgroundColor: appbarColor,
         elevation: 10,
+        actions: [
+          GetBuilder<DoctorHomeCtr>(
+              id: 'appBar',
+              builder: (_) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: badges.Badge(
+                    badgeStyle: badges.BadgeStyle(badgeColor: Colors.redAccent),
+                    showBadge: dcCtr.notifNum >0 ?true:false,
+                    position: badges.BadgePosition.custom(start: 25),
+                    badgeContent: Text(dcCtr.notifNum.toString()),
+                    child: IconButton(
+                      onPressed: () {
+                        dcCtr.selectScreen(4);
+                      },
+                      icon: Icon(Icons.notifications,color: Colors.white,),
+                    ),
+                  ),
+                );
+              }
+          )
+        ],
       ),
-      body: Container(
-        alignment: Alignment.topCenter,
-        width: size.width,
-        height: size.height,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/Landing page – 1.png"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: GetBuilder<PatientsListCtr>(
-          builder: (_)=>(dcCtr.myPatients.isNotEmpty)
+      body: backGroundTemplate(
+        child: GetBuilder<DoctorHomeCtr>(
+          builder: (_)=>(dcCtr.myPatientsMap.isNotEmpty)
               ? ListView.builder(
               itemExtent: 130,
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
               shrinkWrap: true,
-              itemCount: dcCtr.myPatients.length,
+              itemCount: dcCtr.myPatientsMap.length,
               itemBuilder: (BuildContext context, int index) {
-                String key = dcCtr.myPatients.keys.elementAt(index);
-                return patientCard(dcCtr.myPatients[key]!,authCtr.cUser.patients!,context);
+                String key = dcCtr.myPatientsMap.keys.elementAt(index);
+                return patientCard(dcCtr.myPatientsMap[key]!,authCtr.cUser.patients);
               }
           ):dcCtr.loadingUsers?
           Center(
@@ -61,17 +75,17 @@ class _MyPatientsState extends State<MyPatients> {
           )
               :Center(
 
-            child:Text('you have no patients yet', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
-              textStyle:  TextStyle(
-                  fontSize: 23  ,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700
-              ),
-            ))
+              child:Text('you have no patients yet', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
+                textStyle:  TextStyle(
+                    fontSize: 23  ,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700
+                ),
+              ))
           ),
 
         ),
-      ),
+      )
       // floatingActionButton: Container(
       //   alignment: AlignmentDirectional.bottomStart,
       //   height: 60.0,
@@ -94,3 +108,4 @@ class _MyPatientsState extends State<MyPatients> {
     );
   }
 }
+

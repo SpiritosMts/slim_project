@@ -1,7 +1,11 @@
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:smart_care/manager/myUi.dart';
 import 'package:smart_care/manager/styles.dart';
+import 'package:smart_care/models/user.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../manager/myVoids.dart';
@@ -14,34 +18,33 @@ class PatientInfo extends StatefulWidget {
 }
 
 class _PatientInfoState extends State<PatientInfo> {
+
+  ScUser user =ScUser();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+     user = Get.arguments['user'];
+
+  }
+
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Patient Info"),
-
+        title: Text("About ${user.name}"),
         centerTitle: true,
         backgroundColor: appbarColor,
         elevation: 10,
       ),
-      body: Container(
-
-          alignment: Alignment.topCenter,
-          width: size.width,
-          height: size.height,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/images/Landing page – 1.png"),
-              fit: BoxFit.cover,
-            ),
-          ),
-        child:patientInfo(dcCtr.doctorSelectedUser, context),
+      body: backGroundTemplate(
+        child: patientInfo(user),
       ),
 
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-        floatingActionButton:authCtr.cUser.patients!.contains(dcCtr.doctorSelectedUser.id)? Padding(
+        floatingActionButton:authCtr.cUser.patients.contains(user.id)? Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0,vertical: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -52,7 +55,7 @@ class _PatientInfoState extends State<PatientInfo> {
                 child: FittedBox(
                   child: FloatingActionButton.extended(
                     onPressed: () {
-                      patCtr.removePatient(dcCtr.doctorSelectedUser);
+                      patListCtr.removePatient(user);
                       },
                     heroTag: 'sfs-',
                     backgroundColor: Colors.green,
@@ -66,8 +69,8 @@ class _PatientInfoState extends State<PatientInfo> {
                 child: FittedBox(
                   child: FloatingActionButton.extended(
                     onPressed: () {
-                      print('## tryin to call: <${dcCtr.doctorSelectedUser.number}> ');
-                      launchUrl(Uri.parse("tel://${dcCtr.doctorSelectedUser.number}"));
+                      print('## tryin to call: <${user.number}> ');
+                      launchUrl(Uri.parse("tel://${user.number}"));
                     },
                     heroTag: '.df',
                     backgroundColor: Colors.green,

@@ -7,18 +7,18 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smart_care/manager/dataBase.dart';
 import 'package:smart_care/manager/myVoids.dart';
+import 'package:smart_care/models/user.dart';
 
 class ChatRoomCtr extends GetxController {
-  String senderID = Get.arguments['senderID'];
+  ScUser userChatWith = Get.arguments['user'];
   String chatRoomID = '';
-  late  StreamSubscription<QuerySnapshot> streamSub;
+  late StreamSubscription<QuerySnapshot> streamSub;
   Map<String, dynamic> messages = {};
   List<Widget> messagesWidgets = [];
 
   @override
   void onInit() {
     super.onInit();
-    print('## init ChatRoomCtr');
     getChatRoomID();
     Future.delayed(const Duration(seconds: 0), () {
       streamingDoc(roomsColl,chatRoomID);
@@ -27,22 +27,19 @@ class ChatRoomCtr extends GetxController {
   @override
   void onClose() {
     super.onClose();
-    print('## close ChatRoomCtr');
     stopStreamingDoc();
   }
 
   getChatRoomID() async {
     if (authCtr.cUser.role == 'doctor') {
-      chatRoomID = (authCtr.cUser.id! + senderID);
+      chatRoomID = (authCtr.cUser.id! + userChatWith.id!); // doctorID + patientID
     } else {
-      chatRoomID = (senderID + authCtr.cUser.id!);
+      chatRoomID = (userChatWith.id! + authCtr.cUser.id!); // patientID + doctorID
     }
     bool roomExists = await checkIfDocExists('sc_rooms', chatRoomID);
 
     if (!roomExists) {
-      roomsColl
-          .doc(chatRoomID)
-          .set({
+      roomsColl.doc(chatRoomID).set({
         'messages': {},
         'id':chatRoomID})
           .then((_) => print('## new chatRoom added'))

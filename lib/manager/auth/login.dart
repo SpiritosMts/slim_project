@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:smart_care/manager/auth/forgotPwd.dart';
 import 'package:smart_care/manager/auth/register.dart';
 import 'package:smart_care/manager/auth/registerSelectType.dart';
 import 'package:smart_care/manager/myUi.dart';
@@ -62,7 +63,7 @@ class _LoginState extends State<Login> {
                     height: 30,
                   ),
 
-                  /// belaaraby Image
+                  /// logo Image
                   Image.asset(
                     'assets/images/logo.png',
                     fit: BoxFit.cover,
@@ -132,90 +133,100 @@ class _LoginState extends State<Login> {
                           ),
                           SizedBox(height: 25),
 
-                          customTextField(
-                            controller: passwordTec,
-                            labelText: 'Password'.tr,
-                            hintText: 'Enter your password'.tr,
-                            icon: Icons.lock,
-                            isPwd: true,
-                            obscure: _isPwdObscure,
-                            onSuffClick: (){
-                              setState(() {
-                                _isPwdObscure = !_isPwdObscure;
-                              });
-                            },
-                            validator: (value) {
-                              RegExp regex = RegExp(r'^.{6,}$');
-                              if (value!.isEmpty) {
-                                return 'password can\'t be empty'.tr;
-                              }
-                              if (!regex.hasMatch(value)) {
-                                return ('Enter a valid password of at least 6 characters'.tr);
-                              } else {
-                                return null;
-                              }
-                            },
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              customTextField(
+                                controller: passwordTec,
+                                labelText: 'Password'.tr,
+                                hintText: 'Enter your password'.tr,
+                                icon: Icons.lock,
+                                isPwd: true,
+                                obscure: _isPwdObscure,
+                                onSuffClick: (){
+                                  setState(() {
+                                    _isPwdObscure = !_isPwdObscure;
+                                  });
+                                },
+                                validator: (value) {
+                                  RegExp regex = RegExp(r'^.{6,}$');
+                                  if (value!.isEmpty) {
+                                    return 'password can\'t be empty'.tr;
+                                  }
+                                  if (!regex.hasMatch(value)) {
+                                    return ('Enter a valid password of at least 6 characters'.tr);
+                                  } else {
+                                    return null;
+                                  }
+                                },
+                              ),
+                              GestureDetector(
+                                onTap: (){
+                                  Get.to(()=>ForgotPassword());
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 5.0),
+                                  child: Text('forgot password ?'.tr,style: TextStyle(
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.w400,
+                                  ),),
+                                ),
+                              ),
+                            ],
                           ),
 
 
                           SizedBox(
-                            height: 3.h,
+                            height: 30,
                           ),
 
                           /// google_signIn + signIn btn
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              TextButton(
-                                onPressed: (() {
-                                  login();
-                                }),
-                                //icon: const Icon(Icons.login),
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  width: 65,
-                                  height: 35,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFF1b3a4b),
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                  child: Icon(
-                                    Icons.login,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: (() async {
+
+                              customButton(
+                                btnOnPress: () async {
                                   await authCtr.signInWithGoogle();
-                                }),
-                                //icon: const Icon(Icons.login),
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  width: 65,
-                                  height: 35,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFF1b3a4b),
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                  child: Icon(
-                                    Ionicons.logo_google,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
+                                  },
+                                textBtn: 'Google',
+                                btnWidth: 110,
+                                icon: Icon(
+                                  Ionicons.logo_google,
+                                  color: Colors.white.withOpacity(0.7),
+                                  size: 17,
                                 ),
+                                borderCol: customColor1,
+                                fillCol: appbarColor.withOpacity(0.5),
                               ),
+                              SizedBox(width: 10,),
+                              customButton(
+                                btnOnPress: () async {
+                                  login();
+                                },
+                                textBtn: 'Login',
+                                btnWidth: 110,
+                                icon: Icon(
+                                  Icons.login,
+                                  color: Colors.white.withOpacity(0.7),
+                                  size: 19,
+                                ),
+                                borderCol: customColor1,
+                                fillCol: appbarColor.withOpacity(0.5),
+                              ),
+
                             ],
                           ),
 
                           SizedBox(
-                            height: 100.h / 200,
+                            height: 14,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text('you have no account?'.tr,style: TextStyle(
-                                color: Colors.white
+                                color: Colors.white70,
+                                fontWeight: FontWeight.w500,
                               ),),
                               TextButton(
                                 onPressed: (() {
@@ -224,8 +235,9 @@ class _LoginState extends State<Login> {
                                 child: Text(
                                   'Sign Up'.tr,
                                   style: const TextStyle(
+                                    color: Colors.white,
                                     fontSize: 15,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w900,
                                   ),
                                 ),
                               ),

@@ -1,12 +1,41 @@
 
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart' as path;
 import 'myVoids.dart';
 import 'dart:io';
+
+Future<List<String>> getChildrenKeys(String ref) async {
+  List<String> children = [];
+  DatabaseReference serverData = database!.ref(ref);//'patients/sr1'
+  final snapshot = await serverData.get();
+  if (snapshot.exists) {
+    snapshot.children.forEach((element) {
+      children.add(element.key.toString());
+    });
+    print('## <$ref> exists with [${children.length}] children');
+  } else {
+    print('## <$ref> DONT exists');
+  }
+  return children;
+}
+Future<int> getChildrenNum(String ref) async {
+  int childrennum = 0;
+  DatabaseReference serverData = database!.ref(ref);//'patients/sr1'
+  final snapshot = await serverData.get();
+  if (snapshot.exists) {
+    childrennum = snapshot.children.length;
+    print('## <$ref> exists with [${childrennum}] children');
+  } else {
+    print('## <$ref> DONT exists');
+  }
+  //update(['chart']);
+  return childrennum;
+}
 
 
 
@@ -36,7 +65,7 @@ Future<String> uploadOneImgToFb(String filePath, PickedFile? imageFile) async {
 }
 
 /// add DOCUMENT to fireStore
-Future<void> addDocument({required fieldsMap ,required String collName , bool addID=true}) async {
+Future<void> addDocument({required fieldsMap ,required String collName , bool addID=true, bool addRealTime=false, String docPathRealtime='',Map<String,dynamic>? realtimeMap}) async {
   CollectionReference coll = FirebaseFirestore.instance.collection(collName);
 
   // Map fields={
@@ -59,6 +88,14 @@ Future<void> addDocument({required fieldsMap ,required String collName , bool ad
       },
         //SetOptions(merge: true),
       );
+      if(addRealTime){
+        DatabaseReference serverData = database!.ref(docPathRealtime);
+        await serverData.update({
+          "$docID": realtimeMap
+        }).then((value) async {
+        });
+      }
+
     }
 
   }).catchError((error) {
@@ -316,4 +353,17 @@ Future<bool> checkDocExist(String docID, coll) async {
 
   }
   return docSnapshot.exists;
+}
+
+/// Check If Document Exists
+Future<bool> checkIfDocExists(String collName, String docId) async {
+  try {
+    // Get reference to Firestore collection
+    var collectionRef = FirebaseFirestore.instance.collection(collName);
+
+    var doc = await collectionRef.doc(docId).get();
+    return doc.exists;
+  } catch (e) {
+    throw e;
+  }
 }

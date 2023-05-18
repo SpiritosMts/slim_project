@@ -23,6 +23,11 @@ const Color customColor1 = Color(0xFF0F8D9C);
 const Color appbarColor  = Color(0xFF096C7A);
 const Color settingIconColor  = appbarColor;
 const Color chartValuesColor  = Colors.white;
+const Color cardColor  = Color(0xff003A44);
+const Color oldCardCol  = Colors.white38;
+const Color newCardCol  = Colors.greenAccent;
+const Color valuePopColor = customColor1;
+const Color touchVerticalLineColor = accentColor;
 
 const mainCol = Color(0xFFffd716);//ylw
 const mainCol2 = Color(0xFF16254b);//blue

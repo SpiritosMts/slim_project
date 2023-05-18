@@ -239,7 +239,7 @@ class AuthController extends GetxController {
 
     if (cUser.verified) {
       print('## <account> verified > goHome');
-      Get.to(()=>homePage());
+      Get.offAll(()=>homePage());
     }
     else {
       print('## <account> NOT verified');
@@ -354,7 +354,7 @@ class AuthController extends GetxController {
 
 
 
-  void ResetPss(String email, ctx) async {
+  void ResetPss(String email) async {
     try {
       await fbAuth.sendPasswordResetEmail(email: email).then((uid) {
         showTos('password reset has been sent to your mailbox'.tr);
@@ -405,6 +405,14 @@ class AuthController extends GetxController {
   /// refresh user props from database
   refreshCuser() async {
     getUserInfoByEmail(authCtr.cUser.email);
+    if(cUser.role=='patient') {
+      ptCtr.myDoctor = await getUserByID(authCtr.cUser.doctorAttachedID);
+      ptCtr.update();
+    }
+    if(cUser.role=='doctor') {
+      dcCtr.getMyPatientsFromIDs(authCtr.cUser.patients);
+      dcCtr.update();
+    }
   }
 
 
@@ -427,7 +435,7 @@ class AuthController extends GetxController {
 
         if(printDetails) printUser(cUser);
 
-    }).catchError((e) => print("## cant find user in db: $e"));
+    }).catchError((e) => print("## cant find user in db (email_search): $e"));
 
 
   }
@@ -438,7 +446,7 @@ class AuthController extends GetxController {
       cUser = ScUserFromMap(userDoc);
       if(printDetails) printUser(cUser);
 
-    }).catchError((e) => print("## cant find user in db: $e"));
+    }).catchError((e) => print("## cant find user in db (id_search): $e"));
 
 
   }

@@ -1,3 +1,4 @@
+import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -47,6 +48,9 @@ introTimesGet()async{
 
 void main() async{
   await WidgetsFlutterBinding.ensureInitialized();
+  //SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  await Alarm.init(showDebugLogs: true);
 
   sharedPrefs = await SharedPreferences.getInstance();
   initFirebase();
@@ -55,7 +59,7 @@ void main() async{
 
 }
 
-Widget homePage(){
+ Widget homePage(){
   String name = authCtr.cUser.name!;
   if(authCtr.cUser.role=='doctor'){
     showTos('Welcome Dr.${name}');

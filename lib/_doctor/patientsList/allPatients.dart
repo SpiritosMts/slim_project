@@ -8,6 +8,7 @@ import 'package:smart_care/_doctor/patientsList/_patientsListCtr.dart';
 import 'package:smart_care/manager/myUi.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../manager/myVoids.dart';
 import '../../manager/styles.dart';
 
 class AllPatientsView extends StatefulWidget {
@@ -22,9 +23,9 @@ class _AllPatientsViewState extends State<AllPatientsView> {
   searchAppBar() {
     return AppBar(
       backgroundColor: appbarColor,
-      toolbarHeight: 60.0,
       automaticallyImplyLeading: false, // Hide the back button
-
+      centerTitle: true,
+      elevation: 10,
       title: GetBuilder<PatientsListCtr>(
         //id: 'appBar',
           builder: (_) {
@@ -124,10 +125,8 @@ class _AllPatientsViewState extends State<AllPatientsView> {
               shrinkWrap: true,
               itemCount: gc.foundUsersList.length,
               itemBuilder: (BuildContext context, int index) {
-                //setState(() {});
-
                 //String key = gc.foundUsersMap.keys.elementAt(index);
-                return patientCard(gc.foundUsersList[index],gc.patientsIDsStr,context);
+                return patientCard(gc.foundUsersList[index],authCtr.cUser.patients);
               })
               : gc.shouldLoad? Center(
             child: CircularProgressIndicator(),

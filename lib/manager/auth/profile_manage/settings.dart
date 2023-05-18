@@ -9,11 +9,113 @@ import 'package:smart_care/manager/styles.dart';
 
 import '../../myLocale/myLocaleCtr.dart';
 
+// class Settings extends StatefulWidget {
+//   @override
+//   State<Settings> createState() => _SettingsState();
+// }
+// class _SettingsState extends State<Settings> {
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         automaticallyImplyLeading: false,
+//         centerTitle: true,
+//         backgroundColor: appbarColor,
+//         title: Text('Settings'.tr),
+//         //bottom: appBarUnderline(),
+//       ),
+//       body: backGroundTemplate(
+//         child: SettingsList(
+//
+//           lightTheme: const SettingsThemeData(
+//             dividerColor: hintYellowColHex,
+//             titleTextColor: yellowColHex,
+//             leadingIconsColor: yellowColHex,
+//             trailingTextColor: hintYellowColHex2,
+//             settingsListBackground: blueColHex,
+//             //settingsSectionBackground: Colors.lightBlueAccent,
+//             settingsTileTextColor: hintYellowColHex2,
+//             tileHighlightColor: hintYellowColHex,
+//           ),
+//
+//           //shrinkWrap: true,
+//
+//           //applicationType: ApplicationType.cupertino,
+//           contentPadding: EdgeInsets.all(11),
+//
+//           sections: [
+//             ///common
+//             SettingsSection(
+//               //margin: EdgeInsetsDirectional.all(20),
+//              // title: Text('general settings'.tr),
+//               tiles: [
+//                 SettingsTile(
+//                   trailing: Icon(
+//                     Icons.arrow_forward_ios_rounded,
+//                     color: _arrowColor,
+//                   ),
+//                   title: Text('Language'.tr),
+//                   value: Text(lang.tr),
+//                   leading: const Icon(Icons.language),
+//                   onPressed: (BuildContext context) {
+//                     showLanguageDialog(context);
+//                   },
+//                 ),
+//                 ///dark mode
+//                 SettingsTile.switchTile(
+//                   //activeSwitchColor: _activeSwitchColor,
+//                   title: Text('Dark Mode'.tr),
+//                   leading: const Icon(Icons.dark_mode),
+//                   enabled: true,
+//                   initialValue: true,
+//                   onToggle: (val) {
+//                     setState(() {
+//                       //themeGc.onSwitch(val);
+//                     });
+//                   },
+//                 ),
+//
+//                 ///other settings
+//                 // SettingsTile.switchTile(
+//                 //
+//                 //     activeSwitchColor: _activeSwitchColor,
+//                 //     title: Text('Custom theme'),
+//                 //     leading: Icon(Icons.format_paint),
+//                 //     enabled: true,
+//                 //     initialValue: theme,
+//                 //     onToggle: (value) {
+//                 //       setState(() {
+//                 //         theme = value;
+//                 //       });
+//                 //     },
+//                 //     onPressed: (value) {}
+//                 // ),
+//               ],
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+//
+
 class Settings extends StatefulWidget {
+  const Settings({
+    Key? key,
+  }) : super(key: key);
+
   @override
-  State<Settings> createState() => _SettingsState();
+  State<Settings> createState() =>
+      _SettingsState();
 }
+
 class _SettingsState extends State<Settings> {
+
+  bool useCustomTheme = false;
+
+  DevicePlatform selectedPlatform = DevicePlatform.device;
   MyLocaleCtr langGc = Get.find<MyLocaleCtr>();
   //MyThemeCtr themeGc = Get.find<MyThemeCtr>();
   bool theme = false;
@@ -23,12 +125,12 @@ class _SettingsState extends State<Settings> {
 
   //Color _activeSwitchColor = yellowColHex;
   Color _arrowColor = primaryColor;
-  String lang = '';
+  String lang = 'select language';
 
   @override
   void initState() {
     super.initState();
-    print('## initState Settings');
+    //print('## initState Settings');
 
     switch (currLang) {
       case 'ar':
@@ -52,7 +154,7 @@ class _SettingsState extends State<Settings> {
         Padding(
           padding: const EdgeInsets.only(bottom: 35.0),
 
-          child:Text(            'choose language'.tr, textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
+          child:Text('choose language'.tr, textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
             textStyle:  TextStyle(
                 fontSize: 25  ,
                 color: accentColor0,
@@ -126,114 +228,15 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        backgroundColor: appbarColor,
-        title: Text('Settings'.tr),
-        //bottom: appBarUnderline(),
-      ),
-      body: backGroundTemplate(
-        child: SettingsList(
 
-          lightTheme: const SettingsThemeData(
-            dividerColor: hintYellowColHex,
-            titleTextColor: yellowColHex,
-            leadingIconsColor: yellowColHex,
-            trailingTextColor: hintYellowColHex2,
-            settingsListBackground: blueColHex,
-            //settingsSectionBackground: Colors.lightBlueAccent,
-            settingsTileTextColor: hintYellowColHex2,
-            tileHighlightColor: hintYellowColHex,
-          ),
-
-          //shrinkWrap: true,
-
-          //applicationType: ApplicationType.cupertino,
-          contentPadding: EdgeInsets.all(11),
-
-          sections: [
-            ///common
-            SettingsSection(
-              //margin: EdgeInsetsDirectional.all(20),
-             // title: Text('general settings'.tr),
-              tiles: [
-                SettingsTile(
-                  trailing: Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    color: _arrowColor,
-                  ),
-                  title: Text('Language'.tr),
-                  value: Text(lang.tr),
-                  leading: const Icon(Icons.language),
-                  onPressed: (BuildContext context) {
-                    showLanguageDialog(context);
-                  },
-                ),
-                ///dark mode
-                SettingsTile.switchTile(
-                  //activeSwitchColor: _activeSwitchColor,
-                  title: Text('Dark Mode'.tr),
-                  leading: const Icon(Icons.dark_mode),
-                  enabled: true,
-                  initialValue: true,
-                  onToggle: (val) {
-                    setState(() {
-                      //themeGc.onSwitch(val);
-                    });
-                  },
-                ),
-
-                ///other settings
-                // SettingsTile.switchTile(
-                //
-                //     activeSwitchColor: _activeSwitchColor,
-                //     title: Text('Custom theme'),
-                //     leading: Icon(Icons.format_paint),
-                //     enabled: true,
-                //     initialValue: theme,
-                //     onToggle: (value) {
-                //       setState(() {
-                //         theme = value;
-                //       });
-                //     },
-                //     onPressed: (value) {}
-                // ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-
-class CrossPlatformSettingsScreen extends StatefulWidget {
-  const CrossPlatformSettingsScreen({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  State<CrossPlatformSettingsScreen> createState() =>
-      _CrossPlatformSettingsScreenState();
-}
-
-class _CrossPlatformSettingsScreenState
-    extends State<CrossPlatformSettingsScreen> {
-  bool useCustomTheme = false;
-
-  DevicePlatform selectedPlatform = DevicePlatform.device;
+  /// ####################################################"""
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: appbarColor,
-
+        elevation: 10,
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: Text('Settings'.tr),
@@ -274,7 +277,10 @@ class _CrossPlatformSettingsScreenState
               SettingsTile.navigation(
                 leading: Icon(Icons.language,color: settingIconColor,),
                 title: Text('Language'.tr),
-                value: Text('English'.tr),
+                value: Text(lang.tr),
+                onPressed: (tap){
+                  showLanguageDialog(context);
+                },
               ),
               SettingsTile.navigation(
                 leading: Icon(Icons.cloud_outlined,color: settingIconColor,),

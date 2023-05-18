@@ -16,5 +16,8 @@ class MyLocale implements Translations {
         'en': {
 
         },
+        'fr': {
+
+        },
       };
 }

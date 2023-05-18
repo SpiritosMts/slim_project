@@ -1,40 +1,29 @@
 
-
 import 'dart:async';
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:smart_care/manager/firebaseVoids.dart';
 
 import '../../main.dart';
 import '../../manager/myVoids.dart';
 import '../../manager/styles.dart';
 import '../../models/user.dart';
 
-class DoctorHomeCtr extends GetxController{
-  static DoctorHomeCtr instance = Get.find();
+class ChartsCtr extends GetxController{
+  static ChartsCtr instance = Get.find();
   updateCtr(){
     update(['appBar']);
     update(['chart']);
   }
 
-  int notifNum = 0;
 
-  int currentScreenIndex = 0;
-
-  //String gas_tapped_val = '00.00';
   String? selectedServer ;
-  Map<String,ScUser?> myPatientsMap = {};
-  List<String> servers = [];
-  double maxRange = 90;
-  double minRange = 60;
-
-
-
 
 
 
@@ -45,25 +34,28 @@ class DoctorHomeCtr extends GetxController{
   @override
   void onInit() {
     super.onInit();
-    Future.delayed(const Duration(milliseconds: 500), () async {//time to start readin data
-
-        servers = await getChildrenKeys('patients') as List<String>;
-        periodicFunction();
-        changeServer(servers[0]);
-
+    print('## init ChartsCtr');
+    Future.delayed(const Duration(milliseconds: 200), () async {//time to start readin data
+      periodicFunction();
+      //changeServer(authCtr.cUser.id);/// start streamData
     });
   }
+  @override
+  void onClose() {
+    super.onClose();
+    print('## close ChartsCtr');
 
-  selectScreen(int index){
-    currentScreenIndex = index;
-    print('## screen<$currentScreenIndex> selected');
-    update();
   }
+
+  /// #####################################################################################"
+
+
   bool chartLoading = true;
   changeServer(server) async {
     chartLoading = true;
+
     selectedServer = '';
-    if (servers.isEmpty) return;
+    //if (servers.isEmpty) return;
     selectedServer = server;
     print('## selected server = ${selectedServer}');
     if(streamData != null) await streamData!.cancel();
@@ -73,34 +65,6 @@ class DoctorHomeCtr extends GetxController{
     chartLoading = false;
     updateCtr();
   }
-
-
-  bool loadingUsers = true;
-  void getMyPatientsFromIDs(List IDs) async {
-    loadingUsers=true;
-
-    //print('## getting my_patients From IDS....');
-    myPatientsMap.clear();
-    if(IDs.isNotEmpty){
-      for (var id in IDs) {
-        final event = await usersColl.where('id', isEqualTo: id).get();
-        var doc = event.docs.single;
-        myPatientsMap[id] = ScUserFromMap(doc);
-      }
-    }
-
-    print('## got my_patients From IDS <${myPatientsMap.length}>');
-    // if(myPatientsMap.isEmpty){
-    //   loadingUsers=false;
-    // }else{
-    //   loadingUsers=true;
-    // }
-    loadingUsers=false;
-
-    update();
-  }
-
-
 
 
 
@@ -184,8 +148,7 @@ class DoctorHomeCtr extends GetxController{
         b++;
       }else{b=0;}
 
-      update(['chart']);
-      update(['appBar']);
+      updateCtr();
 
     });
   }
@@ -204,7 +167,8 @@ class DoctorHomeCtr extends GetxController{
       double settedDouble  =0.0;
       //print('## LAST-bpm-value:$bpm_data');
       //print('## LAST-bpm-type:${bpm_data.runtimeType}');
-      update(['chart']);
+      updateCtr();
+
 
     });
   }
@@ -235,8 +199,8 @@ class DoctorHomeCtr extends GetxController{
 
 
     loadingHis =false;
-    update(['chart']);
-    update(['appBar']);
+    updateCtr();
+
   }
   Future<List> getHistoryData(dataTypePath) async {
     List dataHis = [];
@@ -258,7 +222,7 @@ class DoctorHomeCtr extends GetxController{
       print('## <${dataTypePath}> history DONT exists');
     }
 
-    update(['chart']);
+    updateCtr();
     //print('## <<${dataHis.length}>> hisValues=<$dataHis> ');
     return dataHis;
   }
@@ -336,7 +300,7 @@ class DoctorHomeCtr extends GetxController{
                   Get.back();
                   Future.delayed(const Duration(milliseconds: 800), () async { //time to start readin history  data
                     initHistoryValues('patients/$selectedServer/bpm_history');
-                    update(['chart']);
+                    updateCtr();
 
                   });
 
@@ -349,7 +313,6 @@ class DoctorHomeCtr extends GetxController{
       },
     );
   }
-
 
 
 }

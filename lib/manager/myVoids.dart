@@ -17,6 +17,8 @@ import 'package:intl/intl.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:smart_care/_doctor/patientsList/_patientsListCtr.dart';
+import 'package:smart_care/_patient/home/patientHome_ctr.dart';
+import 'package:smart_care/chart_live_history/chart_live_history_ctr.dart';
 import 'package:smart_care/manager/auth/authCtr.dart';
 import 'package:smart_care/manager/auth/login.dart';
 import 'package:smart_care/manager/auth/verifyEmail.dart';
@@ -27,6 +29,10 @@ import 'styles.dart';
 
 AuthController authCtr = AuthController.instance;
 DoctorHomeCtr dcCtr = DoctorHomeCtr.instance;
+PatientHomeCtr ptCtr = PatientHomeCtr.instance;
+ChartsCtr chCtr = ChartsCtr.instance;
+PatientsListCtr get patListCtr => Get.find<PatientsListCtr>();
+
 FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 FirebaseDatabase? get fbDatabase => FirebaseDatabase.instance;
 User? get authCurrUser => FirebaseAuth.instance.currentUser;
@@ -35,8 +41,7 @@ String usersCollName = 'sc_users';
 GoogleSignIn googleSign = GoogleSignIn();
 FirebaseDatabase? get database => FirebaseDatabase.instance;
 
-var roomsColl = FirebaseFirestore.instance.collection('chat_rooms');
-PatientsListCtr get patCtr => Get.find<PatientsListCtr>();
+var roomsColl = FirebaseFirestore.instance.collection('sc_rooms');
 FirebaseAuth get fbAuth => FirebaseAuth.instance;
 
 int refreshVerifInSec =5;
@@ -73,15 +78,23 @@ double getDoubleMinValue(List<double> values) {
 double getDoubleMaxValue(List<double> values) {
   return values.reduce((currentMax, value) => value > currentMax ? value : currentMax);
 }
-String getMinValue(List<String> values) {
-  return values.reduce((currentMin, value) {
-    return (value.compareTo(currentMin) < 0) ? value : currentMin;
-  });
+
+// String getMinValue(List<String> values) {
+//   return values.reduce((currentMin, value) {
+//     return (value.compareTo(currentMin) < 0) ? value : currentMin;
+//   });
+// }
+
+double getMinValue(List<String> values) {
+  List<double> doubleList = values.map((str) => double.parse(str)).toList();
+  double minValue = doubleList.reduce((currentMin, value) => value < currentMin ? value : currentMin);
+  return minValue;
 }
-String getMaxValue(List<String> values) {
-  return values.reduce((currentMax, value) {
-    return (value.compareTo(currentMax) > 0) ? value : currentMax;
-  });
+
+double getMaxValue(List<String> values) {
+  List<double> doubleList = values.map((str) => double.parse(str)).toList();
+  double maxValue = doubleList.reduce((currentMax, value) => value > currentMax ? value : currentMax);
+  return maxValue;
 }
 fieldFocusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
   currentFocus.unfocus();
@@ -90,7 +103,18 @@ fieldFocusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFoc
 fieldUnfocusAll() {
   FocusManager.instance.primaryFocus?.unfocus();
 }
+double replaceWithClosestHalf(double value) {
+  int intValue = value.toInt();
+  double decimalPart = value - intValue;
 
+  if (decimalPart < 0.25) {
+    return intValue.toDouble();
+  } else if (decimalPart >= 0.25 && decimalPart < 0.75) {
+    return intValue.toDouble() + 0.5;
+  } else {
+    return intValue.toDouble() + 1.0;
+  }
+}
 showTos(txt, {Color color = Colors.black87,bool withPrint = false}) async {
   Fluttertoast.showToast(
       msg: txt,
@@ -356,6 +380,9 @@ showShouldVerify({bool isLoadingScreen =false}) {
   ).show();
 }
 
+
+
+
 Future<bool> showNoHeader({String? txt,String? btnOkText='delete',Color btnOkColor=Colors.red,IconData? icon=Icons.delete}) async {
   bool shouldDelete = false;
 
@@ -397,3 +424,45 @@ Future<bool> showNoHeader({String? txt,String? btnOkText='delete',Color btnOkCol
 }
 
 
+void declineAppoi(appoiID) {
+  usersColl.doc(authCtr.cUser.id)
+      .get()
+      .then((DocumentSnapshot documentSnapshot) async {
+    if (documentSnapshot.exists) {
+      Map<String, dynamic> appointments = documentSnapshot.get('appointments');
+
+      appointments.remove(appoiID);
+
+      await usersColl.doc(authCtr.cUser.id).update({
+        'appointments': appointments,
+      }).then((value) async {
+        print('## appointment declined');
+        showSnack('appointment declined');
+      }).catchError((error) async {
+        showSnack('appointment declining error');
+      });
+    }
+  });
+}
+
+void acceptAppoi(appoiID) {
+  usersColl
+      .doc(authCtr.cUser.id)
+      .get()
+      .then((DocumentSnapshot documentSnapshot) async {
+    if (documentSnapshot.exists) {
+      Map<String, dynamic> appointments = documentSnapshot.get('appointments');
+
+      appointments[appoiID]['new'] = false;
+
+      await usersColl.doc(authCtr.cUser.id).update({
+        'appointments': appointments,
+      }).then((value) async {
+        print('## appointment accepted');
+        showSnack('appointment accepted');
+      }).catchError((error) async {
+        showSnack('appointment accepting error');
+      });
+    }
+  });
+}
