@@ -61,28 +61,7 @@ class AuthController extends GetxController {
 
 
 
-  deleteUserFromAuth(email,pwd) async {
-    //auth user to delete
-    await fbAuth.signInWithEmailAndPassword(
-      email: email,
-      password: pwd,
-    ).then((value) async {
-      print('## account: <${authCurrUser!.email}> deleted');
-      //delete user
-      authCurrUser!.delete();
-      //signIn with admin
-      await fbAuth.signInWithEmailAndPassword(
-        email: cUser.email!,
-        password: cUser.pwd!,
-      );
-      print('## admin: <${authCurrUser!.email}> reSigned in');
 
-    });
-
-
-
-
-  }
 
   void fetchUser() {
     print('## AuthController fetching User ...');

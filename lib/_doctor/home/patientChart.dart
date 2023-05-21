@@ -81,8 +81,9 @@ class _PatientChartState extends State<PatientChart> {
                       );
                     }).toList(),
                     onChanged: (newValue) {
-                      gc.updateCtr();
                       Future.delayed(const Duration(milliseconds: 800), () {
+                        gc.updateCtr();
+
                         chCtr.changeServer(newValue);
 
                       });

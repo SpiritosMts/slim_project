@@ -115,42 +115,6 @@ void listenToAllPats() {
 
   }
 
-  addPatient(ScUser patient) async {
-    String patID = patient.id!;
-    String dctrID = authCtr.cUser.id!;
-
-    updateDoc(usersColl, patID, {'doctorAttachedID': dctrID});
-
-    //add patient to doctor
-    await addElementsToList([patID], 'patients', dctrID, 'sc_users').then((value) {
-      showSnack("${patient.name} added to my patients list");
-
-    });
-
-    //add doctor to patient
-    //authCtr.refreshCuser();///refresh-user
-    //refresh curr user
-    //authCtr.refreshCuser();
-    //Get.back();
-  }
-
-  removePatient(ScUser patient) async {
-    String patID = patient.id!;
-    String dctrID = patient.doctorAttachedID!;
-    updateDoc(usersColl, patID, {'doctorAttachedID': ''});
-
-    //remove patient to doctor
-    removeElementsFromList([patID], 'patients', dctrID, 'sc_users').then((value) {
-      showSnack("${patient.name} removed from my patients list",color: Colors.redAccent.withOpacity(0.8));
-
-    });
-
-    //remove doctor to patient
-    //refresh curr user
-    //authCtr.refreshCuser();///refresh
-
-    //Get.back();
-  }
 
 
   clearSelectedProduct() async {

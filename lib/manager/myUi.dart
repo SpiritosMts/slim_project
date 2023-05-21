@@ -13,6 +13,7 @@ import 'package:smart_care/models/user.dart';
 
 import '../_doctor/notifications/map.dart';
 import '../_patient/advices/oneAdvice.dart';
+import 'firebaseVoids.dart';
 import 'styles.dart';
 
 
@@ -406,7 +407,9 @@ Widget patientCard(ScUser user, List<dynamic> doctrPats) {
                     icon: Icon(Icons.add),
                     color: Colors.white,
                     onPressed: () {
-                      patListCtr.addPatient(user);
+                      addPatient(user);
+                      dcCtr.updateCtr();
+                      patListCtr.update();
                     },
                   ),
                 ),
@@ -450,13 +453,168 @@ Widget patientCard(ScUser user, List<dynamic> doctrPats) {
                       btnOkText: 'remove',
                     ).then((toAllow) {// if admin accept
                       if (toAllow) {
-                        patListCtr.removePatient(user);
+                        removePatient(user);
+                        dcCtr.updateCtr();
+                        patListCtr.update();
+
                       }
                     });
 
                   },
                 )
             ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+///patientsCard
+Widget userCard(ScUser user) {
+  //double cardHei = user.role=='doctor'? 160: 130;
+  double cardHei = 130;
+
+  return GestureDetector(
+
+    child: Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Container(
+        width: 100.w,
+        height: cardHei,
+        child: Stack(
+          children: [
+            Card(
+              color: cardColor,
+              elevation: 50,
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(color: Colors.white38, width: 2),
+                  borderRadius: BorderRadius.circular(20)),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 5, 15, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 15),
+
+                    ///patient simple info
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/patient.png',
+                          width: 72,
+                          color: Colors.blueGrey,
+                        ),
+                        SizedBox(width: 10),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ///name
+                            Text(
+                              '${user.name}',
+                              style:
+                              TextStyle(color: Colors.white, fontSize: 18,fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 5),
+
+                            ///email
+                            Text(
+                              user.email!,
+                              style:
+                              TextStyle(color: Colors.white, fontSize: 11),
+                            ),
+                            SizedBox(height: 5),
+
+
+                            Text(
+                              //'${user.sex!} (${user.age})',
+                              '${user.sex!} (${user.age != '' ? user.age:user.speciality})',
+
+                              style:
+                              TextStyle(color: Colors.white, fontSize: 13),
+                            ),
+                            SizedBox(height: 5),
+
+                            Text(
+                              'Tel: ${user.number!}',
+                              style:
+                              TextStyle(color: Colors.white, fontSize: 13),
+                            ),
+                            // SizedBox(height: 5),
+                            //
+                            // if(user.role == 'doctor') Text(
+                            //   'Speciality: ${user.speciality!}',
+                            //   style:
+                            //   TextStyle(color: Colors.white, fontSize: 13),
+                            // ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            !user.accepted?
+              Positioned(
+                bottom: cardHei/3,
+                right: 25,
+                child: CircleAvatar(
+                  backgroundColor: Colors.greenAccent.withOpacity(0.7),
+                  radius: 20,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: Icon(Icons.check),
+                    color: Colors.white,
+                    onPressed: () {
+                      showNoHeader(
+                        txt: 'Are you sure you want to accept this user ?',
+                        icon: Icons.check,
+                        btnOkColor: Colors.green,
+                        btnOkText: 'add',
+                      ).then((toAllow) {// if admin accept
+                        if (toAllow) {
+
+                          acceptUser(user.id!);
+                        }
+                      });
+
+                    },
+                  ),
+                ),
+              ):Positioned(
+                bottom: cardHei/3,
+                right: 25,
+                child: CircleAvatar(
+                  backgroundColor: Colors.red.withOpacity(0.6),
+                  radius: 20,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: Icon(Icons.close,size: 19),
+                    color: Colors.white,
+                    onPressed: () {
+                      showNoHeader(
+                        txt: 'Are you sure you want to remove this user ?',
+                        icon: Icons.close,
+                        btnOkColor: Colors.red,
+                        btnOkText: 'remove',
+                      ).then((toAllow) {// if admin accept
+                        if (toAllow) {
+
+                          deleteUser(user.id!);// delete user from firestore
+                          deleteUserFromAuth(user.email, user.pwd);// delete from auth
+
+
+                        }
+                      });
+                      },
+                  ),
+                ),
+              ),
+
+
           ],
         ),
       ),

@@ -195,7 +195,9 @@ class _AttachedDoctorState extends State<AttachedDoctor> {
                         btnOnPress: () async {
                           showNoHeader(txt: 'Are you sure you want to remove this doctor ?',btnOkText: 'Remove',icon: Icons.close).then((accept) {
                             if (accept) {
-                              patListCtr.removePatient(authCtr.cUser);
+                              removePatient(authCtr.cUser);
+                              //dcCtr.updateCtr();
+                              ptCtr.updateCtr();
                               //authCtr.refreshCuser();///refresh-user
 
                             }

@@ -3,6 +3,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:path/path.dart' as path;
@@ -366,4 +368,53 @@ Future<bool> checkIfDocExists(String collName, String docId) async {
   } catch (e) {
     throw e;
   }
+}
+
+deleteUser(String userID) {
+  usersColl.doc(userID).delete().then((value) async {
+    print('## user deleted');
+    //removeUserServers(userID);
+    showSnack('user deleted'.tr,color: Colors.redAccent.withOpacity(0.8));
+  }).catchError((error) async {
+    print('## user deleting error = ${error}');
+    //showSnack('doctor accepted');
+  });
+  ;
+}
+
+deleteUserFromAuth(email,pwd) async {
+  //auth user to delete
+  await fbAuth.signInWithEmailAndPassword(
+    email: email,
+    password: pwd,
+  ).then((value) async {
+    print('## account: <${authCurrUser!.email}> deleted');
+    //delete user
+    authCurrUser!.delete();
+    //signIn with admin
+    await fbAuth.signInWithEmailAndPassword(
+      email: authCtr.cUser.email!,
+      password: authCtr.cUser.pwd!,
+    );
+    print('## admin: <${authCurrUser!.email}> reSigned in');
+
+  });
+
+}
+acceptUser(String userID) {
+  usersColl.doc(userID).get().then((DocumentSnapshot documentSnapshot) async {
+    if (documentSnapshot.exists) {
+      await usersColl.doc(userID).update({
+        'verified': true, // turn verified to true in  db
+      }).then((value) async {
+        //addFirstServer(userID);
+        print('## user request accepted');
+        showSnack('doctor request accepted'.tr);
+
+      }).catchError((error) async {
+        print('## user request accepted accepting error =${error}');
+        //toastShow('user request accepted accepting error');
+      });
+    }
+  });
 }

@@ -21,7 +21,10 @@ class ScUser {
   Map<String,dynamic> appointments;
   Map<String,dynamic> notifications;
   String? doctorAttachedID;
+  String? espCode;
   bool verified;
+  bool accepted;
+  bool isAdmin;
   List<String> patients;
 
 
@@ -34,11 +37,14 @@ class ScUser {
     this.name = '',
     this.joinDate = '',
     this.role = '',
+    this.espCode = '',
     this.number = '',
     this.sex = '',
     this.address = '',
     this.age = '',
+    this.isAdmin = false,
     this.verified = false,
+    this.accepted = false,
     this.notifications = const{},
 
     this.hasPatients = false,//doc
@@ -77,6 +83,10 @@ ScUser ScUserFromMap(userDoc){
   user.speciality = userDoc.get('speciality');
   user.role = userDoc.get('role');
   user.verified = userDoc.get('verified');
+  user.accepted = userDoc.get('accepted');
+  user.isAdmin = userDoc.get('isAdmin');
+  user.joinDate = userDoc.get('joinDate');
+  user.joinDate = userDoc.get('joinDate');
   user.joinDate = userDoc.get('joinDate');
 
   List<dynamic> fbList = userDoc.get('patients');

@@ -26,6 +26,7 @@ class _RegisterState extends State<Register> {
   final nameTec = TextEditingController();
 
   final phoneTec = TextEditingController();
+  final espCodeTec = TextEditingController();
   final specialityTec = TextEditingController();
   final addressTec = TextEditingController();
   final ageTec = TextEditingController();
@@ -64,6 +65,8 @@ class _RegisterState extends State<Register> {
     'verified': verifyAnyCreatedAccount? true:  false,
 
     'isAdmin': false,
+    'accepted': false,
+    'espCode': isPatient ?espCodeTec.text:'',
     'speciality': specialityTec.text,
     'age': ageTec.text,
     'address': addressTec.text,
@@ -281,6 +284,26 @@ class _RegisterState extends State<Register> {
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "number can\'t be empty".tr;
+                      }
+                     else {
+                        return null;
+                      }
+                    },
+                  ),
+                  SizedBox(height: spaceFields),
+                  customTextField(
+                    textInputType: TextInputType.text,
+
+                    controller: espCodeTec,
+                    labelText: 'Code'.tr,
+                    hintText: 'Enter your esp code'.tr,
+                    icon: Icons.qr_code,
+                    isPwd: false,
+                    obscure: false,
+                    onSuffClick: (){},
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return "code can\'t be empty".tr;
                       }
                      else {
                         return null;

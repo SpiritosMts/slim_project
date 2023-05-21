@@ -26,10 +26,12 @@ import 'package:smart_care/chart_live_history/chart_live_history_ctr.dart';
 import 'package:smart_care/manager/auth/authCtr.dart';
 import 'package:smart_care/manager/auth/login.dart';
 import 'package:smart_care/manager/auth/verifyEmail.dart';
+import 'package:smart_care/models/user.dart';
 
 import '../_doctor/home/doctorHome_ctr.dart';
 import '../alarm/ring_alarm.dart';
 import '../main.dart';
+import 'dataBase.dart';
 import 'styles.dart';
 
 AuthController authCtr = AuthController.instance;
@@ -576,3 +578,38 @@ void deleteNotif(notifID) {
 }
 
 
+removePatient(ScUser patient) async {
+  String patID = patient.id!;
+  String dctrID = patient.doctorAttachedID!;
+  updateDoc(usersColl, patID, {'doctorAttachedID': ''});
+
+  //remove patient to doctor
+  removeElementsFromList([patID], 'patients', dctrID, 'sc_users').then((value) {
+    showSnack("${patient.name} removed from my patients list",color: Colors.redAccent.withOpacity(0.8));
+
+  });
+
+  //remove doctor to patient
+  //refresh curr user
+  //authCtr.refreshCuser();///refresh
+
+  //Get.back();
+}
+addPatient(ScUser patient) async {
+  String patID = patient.id!;
+  String dctrID = authCtr.cUser.id!;
+
+  updateDoc(usersColl, patID, {'doctorAttachedID': dctrID});
+
+  //add patient to doctor
+  await addElementsToList([patID], 'patients', dctrID, 'sc_users').then((value) {
+    showSnack("${patient.name} added to my patients list");
+
+  });
+
+  //add doctor to patient
+  //authCtr.refreshCuser();///refresh-user
+  //refresh curr user
+  //authCtr.refreshCuser();
+  //Get.back();
+}

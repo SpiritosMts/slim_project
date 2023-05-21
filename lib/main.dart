@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_care/_admin/allUsers.dart';
 import 'package:smart_care/_doctor/home/doctorHome.dart';
 import 'package:smart_care/_patient/home/patientHome.dart';
 import 'package:smart_care/manager/auth/authCtr.dart';
@@ -65,6 +66,11 @@ void main() async{
 
  Widget homePage(){
   String name = authCtr.cUser.name!;
+  if(authCtr.cUser.isAdmin){
+    showTos('Welcome admin ${name}');
+    return AllUsers();
+  }
+
   if(authCtr.cUser.role=='doctor'){
     showTos('Welcome Dr.${name}');
     return DoctorHome();
