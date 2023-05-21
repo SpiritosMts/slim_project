@@ -37,7 +37,9 @@ class _AdvicesState extends State<Advices> {
                 itemCount: ptCtr.advices.length,
                 itemBuilder: (BuildContext context, int index) {
                   //String key = ptCtr.advices.keys.elementAt(index);
-                  return adviceCard(ptCtr.advices[index]);
+                  bool newAdvice = false;
+                  if(index == 0) newAdvice = true;
+                  return adviceCard(ptCtr.advices[index],newAdvice: newAdvice);
                 }
             ):Center(
 

@@ -3,6 +3,9 @@
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:math';
+import 'package:alarm/alarm.dart';
+import 'package:alarm/model/alarm_settings.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,6 +19,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:smart_care/_doctor/notifications/awesomeNotif.dart';
 import 'package:smart_care/_doctor/patientsList/_patientsListCtr.dart';
 import 'package:smart_care/_patient/home/patientHome_ctr.dart';
 import 'package:smart_care/chart_live_history/chart_live_history_ctr.dart';
@@ -24,13 +28,16 @@ import 'package:smart_care/manager/auth/login.dart';
 import 'package:smart_care/manager/auth/verifyEmail.dart';
 
 import '../_doctor/home/doctorHome_ctr.dart';
+import '../alarm/ring_alarm.dart';
 import '../main.dart';
 import 'styles.dart';
 
 AuthController authCtr = AuthController.instance;
-DoctorHomeCtr dcCtr = DoctorHomeCtr.instance;
-PatientHomeCtr ptCtr = PatientHomeCtr.instance;
-ChartsCtr chCtr = ChartsCtr.instance;
+
+ChartsCtr get chCtr => Get.find<ChartsCtr>();
+DoctorHomeCtr get dcCtr => Get.find<DoctorHomeCtr>();
+PatientHomeCtr get ptCtr => Get.find<PatientHomeCtr>();
+
 PatientsListCtr get patListCtr => Get.find<PatientsListCtr>();
 
 FirebaseAuth firebaseAuth = FirebaseAuth.instance;
@@ -49,6 +56,10 @@ int introShowTimes =1;
 bool verifyAnyCreatedAccount =true;
 bool showLiveTime =false;
 
+
+bool isCtrInitialized<T extends GetxController>() {
+  return Get.isRegistered<T>();
+}
 
 // String getUserNameByID(userID){
 //   String userName = 'unknown';
@@ -150,18 +161,22 @@ double calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 
-showSnack(txt) {
+showSnack(txt,{Color? color}) {
   Get.snackbar(
     txt,
     '',
     messageText: Container(),
     colorText: Colors.white,
-    backgroundColor: Colors.black54,
+    backgroundColor:color?? Colors.greenAccent.withOpacity(0.70),
     snackPosition: SnackPosition.BOTTOM,
   );
 }
 
-
+String getMonthName(int monthNumber) {
+  final dateTime = DateTime(2023, monthNumber);
+  final monthFormat = DateFormat.MMMM();
+  return monthFormat.format(dateTime);
+}
 
 
 String todayToString({bool showHours = false}) {
@@ -310,6 +325,7 @@ showSuccess({String? sucText, Function()? btnOkPress}) {
     //btnOkIcon: Icons.check_circle,
   ).show();
 }
+
 showWarning({String? txt, Function()? btnOkPress}) {
   return AwesomeDialog(
     dialogBackgroundColor: dialogsCol,
@@ -341,6 +357,55 @@ showWarning({String? txt, Function()? btnOkPress}) {
     //btnOkIcon: Icons.check_circle,
   ).show();
 }
+
+showAlarm({int? alarmID,String? name}) {
+  return AwesomeDialog(
+    dialogBackgroundColor: dialogsCol,
+    autoDismiss: true,
+    context: navigatorKey.currentContext!,
+    dismissOnBackKeyPress: false,
+    headerAnimationLoop: true,
+    dismissOnTouchOutside: false,
+    animType: AnimType.scale,
+    dialogType: DialogType.warning,
+    //showCloseIcon: true,
+    //title: 'Success'.tr,
+
+    descTextStyle: GoogleFonts.almarai(
+      height: 1.8,
+      textStyle: const TextStyle(fontSize: 14),
+    ),
+    btnOkColor: Color(0xFFFEB800),
+    //desc: 'You are in danger',
+    btnOkText: 'Stop'.tr,
+
+    body: AnimatedTextKit(
+      animatedTexts: [
+        TypewriterAnimatedText('${authCtr.cUser.role == 'patient' ? 'You are': '${name} is'} in danger'.tr,
+            textStyle: GoogleFonts.indieFlower(
+              textStyle:  TextStyle(
+                  fontSize: 21,
+                  color: accentColor0,
+                  fontWeight: FontWeight.w800
+              ),
+            ),
+            speed: const Duration(
+              milliseconds: 80,
+            )),
+      ],
+      isRepeatingAnimation: true,
+      totalRepeatCount: 40,
+    ),
+    btnOkOnPress: () {
+      Alarm.stop(alarmID!).then((_) {
+        Get.back();
+      });
+    },
+
+  ).show();
+}
+
+
 showShouldVerify({bool isLoadingScreen =false}) {
   return AwesomeDialog(
     dialogBackgroundColor: dialogsCol,
@@ -396,7 +461,7 @@ Future<bool> showNoHeader({String? txt,String? btnOkText='delete',Color btnOkCol
     headerAnimationLoop: false,
     dialogType: DialogType.noHeader,
     animType: AnimType.scale,
-    btnCancelIcon: Icons.close,
+    btnCancelIcon: Icons.arrow_back_ios_sharp,
     btnCancelColor: Colors.grey,
     btnOkIcon: icon ?? Icons.delete,
     btnOkColor: btnOkColor,
@@ -437,9 +502,9 @@ void declineAppoi(appoiID) {
         'appointments': appointments,
       }).then((value) async {
         print('## appointment declined');
-        showSnack('appointment declined');
+        showSnack('appointment declined',color:Colors.black54);
       }).catchError((error) async {
-        showSnack('appointment declining error');
+        showSnack('appointment declining error',color: Colors.redAccent.withOpacity(0.8));
       });
     }
   });
@@ -461,8 +526,53 @@ void acceptAppoi(appoiID) {
         print('## appointment accepted');
         showSnack('appointment accepted');
       }).catchError((error) async {
-        showSnack('appointment accepting error');
+        showSnack('appointment accepting error',color:Colors.redAccent.withOpacity(0.8));
       });
     }
   });
 }
+void openNotif(notifID) {
+  usersColl
+      .doc(authCtr.cUser.id)
+      .get()
+      .then((DocumentSnapshot documentSnapshot) async {
+    if (documentSnapshot.exists) {
+      Map<String, dynamic> notifications = documentSnapshot.get('notifications');
+
+      notifications[notifID]['new'] = false;
+
+      await usersColl.doc(authCtr.cUser.id).update({
+        'notifications': notifications,
+      }).then((value) async {
+        //showSnack('appointment accepted');
+      }).catchError((error) async {
+        //showSnack('appointment accepting error',color:Colors.redAccent.withOpacity(0.8));
+      });
+    }
+  });
+}
+void deleteNotif(notifID) {
+  usersColl.doc(authCtr.cUser.id)
+      .get()
+      .then((DocumentSnapshot documentSnapshot) async {
+    if (documentSnapshot.exists) {
+      Map<String, dynamic> notifications = documentSnapshot.get('notifications');
+
+
+      notifications.remove(notifID);
+
+      await usersColl.doc(authCtr.cUser.id).update({
+        'notifications': notifications,
+      }).then((value) async {
+        print('## notif deleted');
+        //showSnack('appointment declined',color:Colors.black54);
+      }).catchError((error) async {
+        print('## notif delete failed');
+
+        //showSnack('appointment declining error',color: Colors.redAccent.withOpacity(0.8));
+      });
+    }
+  });
+}
+
+

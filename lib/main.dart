@@ -20,6 +20,8 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import '_doctor/notifications/awesomeNotif.dart';
+
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 SharedPreferences? sharedPrefs;
@@ -55,6 +57,8 @@ void main() async{
   sharedPrefs = await SharedPreferences.getInstance();
   initFirebase();
   introTimesGet();
+  await NotificationController.initializeLocalNotifications(debug: true);///awesome notif
+
   runApp(MyApp());
 
 }

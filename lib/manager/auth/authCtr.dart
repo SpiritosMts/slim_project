@@ -10,6 +10,8 @@ import 'package:smart_care/manager/auth/registerSelectType.dart';
 import 'package:smart_care/manager/firebaseVoids.dart';
 import 'package:smart_care/manager/myVoids.dart';
 
+import '../../_patient/home/patientHome_ctr.dart';
+import '../../chart_live_history/chart_live_history_ctr.dart';
 import '../../main.dart';
 import '../../models/user.dart';
 
@@ -46,7 +48,6 @@ class AuthController extends GetxController {
     super.onInit();
     Future.delayed(const Duration(seconds: 0), () {
       //streamingDoc(usersColl,'Y1nMifjP7ga7lTNW4pZd');
-
     });
   }
   @override
@@ -375,6 +376,10 @@ class AuthController extends GetxController {
     cUser = ScUser();
     //sharedPrefs!.setBool('isGuest', false);
     //Get.delete<AuthController>();
+    Get.delete<DoctorHomeCtr>();
+    Get.delete<PatientHomeCtr>();
+    Get.delete<ChartsCtr>();
+
     //fetchUser();
     Get.offAll(()=>Login());
     print('## user signed out');
@@ -404,13 +409,13 @@ class AuthController extends GetxController {
 
   /// refresh user props from database
   refreshCuser() async {
+    print('## refreshing user .....');
     getUserInfoByEmail(authCtr.cUser.email);
     if(cUser.role=='patient') {
-      ptCtr.myDoctor = await getUserByID(authCtr.cUser.doctorAttachedID);
+      //ptCtr.myDoctor = await getUserByID(authCtr.cUser.doctorAttachedID!);
       ptCtr.update();
     }
     if(cUser.role=='doctor') {
-      dcCtr.getMyPatientsFromIDs(authCtr.cUser.patients);
       dcCtr.update();
     }
   }
@@ -421,19 +426,24 @@ class AuthController extends GetxController {
   /// GET-USER-INFO VY PROP
 
   Future<void> getUserInfoByEmail(userEmail,{bool printDetails = true}) async {
-    await usersColl.where('email', isEqualTo: userEmail).get().then((event) {
-      var userDoc = event.docs.single;
-      //print('## getiing <$userEmail> from db ...');
-      cUser = ScUserFromMap(userDoc);
-      // getPatientsFromIDs(authCtr.cUser.patients!);
-      // Future.delayed(const Duration(milliseconds: 1500), () async {//time to start readin data
-      //   //Get.find<DoctorHomeCtr>().update(['appBar']);
-      //   Get.find<DoctorHomeCtr>().updateCtr();
-      //   update();
-      //
-      // });
+    print('## getting user info by email ...  ##');
 
-        if(printDetails) printUser(cUser);
+    await usersColl.where('email', isEqualTo: userEmail).get().then((event) async {
+      var userDoc = event.docs.single;
+      cUser = ScUserFromMap(userDoc);
+      printUser(cUser);
+
+      //Get.put<ChartsCtr>(ChartsCtr());
+
+      // if(cUser.role=='patient') {
+      //   print('## connected-user is < patient >##');
+      //   //Get.put<PatientHomeCtr>(PatientHomeCtr());
+      // }
+      // if(cUser.role=='doctor') {
+      //   print('## connected-user is < doctor > ##');
+      //   //Get.put<DoctorHomeCtr>(DoctorHomeCtr());
+      // }
+        //if(printDetails) printUser(cUser);
 
     }).catchError((e) => print("## cant find user in db (email_search): $e"));
 
@@ -444,7 +454,7 @@ class AuthController extends GetxController {
     await usersColl.where('id', isEqualTo: userID).get().then((event) {
       var userDoc = event.docs.single;
       cUser = ScUserFromMap(userDoc);
-      if(printDetails) printUser(cUser);
+      //if(printDetails) printUser(cUser);
 
     }).catchError((e) => print("## cant find user in db (id_search): $e"));
 

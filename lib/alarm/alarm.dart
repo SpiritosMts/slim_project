@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:smart_care/alarm/ring_alarm.dart';
 import 'package:smart_care/alarm/tile_alarm.dart';
+import 'package:smart_care/main.dart';
 
 import 'edit_alarm.dart';
 
@@ -43,10 +45,11 @@ class _ExampleAlarmHomeScreenState extends State<ExampleAlarmHomeScreen> {
 
   Future<void> navigateToRingScreen(AlarmSettings alarmSettings) async {
     await Navigator.push(
-        context,
+        navigatorKey.currentContext!,
         MaterialPageRoute(
           builder: (context) => ExampleAlarmRingScreen(alarmSettings: alarmSettings),
         ));
+    //Get.to(()=>);
     loadAlarms();
   }
 

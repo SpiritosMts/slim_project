@@ -8,7 +8,7 @@ Future<List<DocumentSnapshot>> getDocumentsByColl(coll) async {
 
   final List<DocumentSnapshot> documentsFound = snap.docs;
 
-  print('## collection docs number => (${documentsFound.length})');
+  print('## collection docs number from firestore => (${documentsFound.length})');
 
   return documentsFound;
 }
@@ -103,8 +103,7 @@ Future<void> addElementsToList(
   });
 }
 
-updateDoc(
-    CollectionReference coll, docID, Map<String, dynamic> mapToUpdate) async {
+updateDoc(CollectionReference coll, docID, Map<String, dynamic> mapToUpdate) async {
   coll.doc(docID).update(mapToUpdate).then((value) async {
     print("### doc with id:<$docID> updated ");
   }).catchError((e) async {

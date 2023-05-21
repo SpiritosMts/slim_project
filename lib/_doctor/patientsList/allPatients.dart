@@ -118,7 +118,7 @@ class _AllPatientsViewState extends State<AllPatientsView> {
       appBar: searchAppBar(),
       body: backGroundTemplate(
         child: GetBuilder<PatientsListCtr>(
-          builder: (ctr) => (gc.foundUsersList.isNotEmpty)
+          builder: (_) => (gc.foundUsersList.isNotEmpty)
               ? ListView.builder(
             //itemExtent: 130,
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
@@ -126,7 +126,7 @@ class _AllPatientsViewState extends State<AllPatientsView> {
               itemCount: gc.foundUsersList.length,
               itemBuilder: (BuildContext context, int index) {
                 //String key = gc.foundUsersMap.keys.elementAt(index);
-                return patientCard(gc.foundUsersList[index],authCtr.cUser.patients);
+                return patientCard(gc.foundUsersList[index],dcCtr.myPatientsMap.keys.toList());
               })
               : gc.shouldLoad? Center(
             child: CircularProgressIndicator(),

@@ -41,22 +41,30 @@ class _NotificationsState extends State<Notifications> {
       body: backGroundTemplate(
         child: StreamBuilder<QuerySnapshot>(
           stream: usersColl.where('id', isEqualTo: authCtr.cUser.id).snapshots(),
-          builder: (
-              BuildContext context,
-              AsyncSnapshot<QuerySnapshot> snapshot,
-              ) {
+          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasData) {
-              var doctr = snapshot.data!.docs.first;
-              Map<String,dynamic> notifications = doctr.get('notifications');
+              var usr = snapshot.data!.docs.first;
+              Map<String,dynamic> notifications = usr.get('notifications');
+
+              // if(authCtr.cUser.role == 'doctor'){
+              //   dcCtr.notifNum = notifications.length;
+              //   dcCtr.updateCtr();
+              // }else{//patinet
+              //   ptCtr.notifNum = notifications.length;
+              //   ptCtr.updateCtr();
+              // }
+
               return  (notifications.isNotEmpty)
                   ? ListView.builder(
                   itemExtent: 130,
                   padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                   shrinkWrap: true,
+
+                  reverse: true,
                   itemCount: notifications.length,
                   itemBuilder: (BuildContext context, int index) {
-                    //String key = notifications.keys.elementAt(index);
-                    return notifCard(notifications[index.toString()]!);
+                    String key = notifications.keys.elementAt(index);
+                    return notifCard(key, notifications[key]);
                   }
               ):Center(
                 child: Text('no notifications found', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(

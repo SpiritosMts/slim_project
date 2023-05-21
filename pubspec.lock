@@ -73,6 +73,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  awesome_notifications:
+    dependency: "direct main"
+    description:
+      name: awesome_notifications
+      sha256: "2b430c75cc879d6cfd52bb6eb2b5c1591ed425347816408cdcbd3f6916bba14c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.4+1"
   badges:
     dependency: "direct main"
     description:
@@ -438,6 +446,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  flutter_datetime_picker:
+    dependency: "direct main"
+    description:
+      name: flutter_datetime_picker
+      sha256: "8e695c63c769350e541951227c2775190ec73ceda774a315b1dc9a99d5facfe5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.5.1"
   flutter_fgbg:
     dependency: transitive
     description:
@@ -550,6 +566,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.14"
+  flutter_sparkline:
+    dependency: "direct main"
+    description:
+      name: flutter_sparkline
+      sha256: d5b7f601db1d4716da625f0a32ffc66f809435ea0384f52d603ba216dc5306d4
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -1088,6 +1112,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  simple_ripple_animation:
+    dependency: "direct main"
+    description:
+      name: simple_ripple_animation
+      sha256: e194718e95e77be86a8a6421d236ef4dc5ded1113c26e938e3e7f1a722b922a4
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.7"
   sky_engine:
     dependency: transitive
     description: flutter

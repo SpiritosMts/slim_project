@@ -2,20 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:bottom_bar_with_sheet/bottom_bar_with_sheet.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:smart_care/_doctor/home/doctorHome_ctr.dart';
 import 'package:smart_care/_doctor/home/patientChart.dart';
 import 'package:smart_care/_doctor/notifications/notifications.dart';
 import 'package:smart_care/_doctor/patientsList/allPatients.dart';
 import 'package:smart_care/_doctor/patientsList/myPatients.dart';
-import 'package:smart_care/_doctor/patientsList/patientInfo.dart';
-import 'package:smart_care/_patient/advices/advices.dart';
-import 'package:smart_care/chatSystem/chatList.dart';
 import 'package:smart_care/manager/auth/profile_manage/settings.dart';
 import 'package:smart_care/manager/myVoids.dart';
 import 'package:smart_care/manager/styles.dart';
 
-import '../../_patient/attachedDoctor/attachedDoctor.dart';
 import '../../manager/myUi.dart';
 import '../appointment/get_appois.dart';
 
@@ -27,31 +22,20 @@ class DoctorHome extends StatefulWidget {
 }
 
 class _DoctorHomeState extends State<DoctorHome> {
-  final DoctorHomeCtr gc = Get.put<DoctorHomeCtr>(DoctorHomeCtr());
+  //final DoctorHomeCtr gc = Get.put<DoctorHomeCtr>(DoctorHomeCtr());
+  //final DoctorHomeCtr gc = Get.find<DoctorHomeCtr>();
 
-  final _bottomBarController = BottomBarWithSheetController(initialIndex: 0);
 
   @override
   void initState() {
-    _bottomBarController.stream.listen((opened) {
+    dcCtr.bottomBarController.stream.listen((opened) {
       debugPrint('## Bottom bar ${opened ? 'opened' : 'closed'}');
     });
+
     super.initState();
   }
 
 
-  Widget sheet(){
-
-    return Center(
-      child: Text('no appointments yet', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
-        textStyle:  TextStyle(
-            fontSize: 23  ,
-            color: Colors.white,
-            fontWeight: FontWeight.w700
-        ),
-      )),
-    );
-  }
 
 
   List<Widget> screens = [
@@ -75,22 +59,22 @@ class _DoctorHomeState extends State<DoctorHome> {
   @override
   Widget build(BuildContext context) {
     return  GetBuilder<DoctorHomeCtr>(
-      builder: (context) {
+      builder: (gc) {
         return Scaffold(
 
           body: backGroundTemplate(
             child: IndexedStack(
-              index: dcCtr.currentScreenIndex,
+              index: gc.currentScreenIndex,
               children: screens
             ),
           ),
           bottomNavigationBar: BottomBarWithSheet(
             onSelectItem: (index) {
-              dcCtr.selectScreen(index);
+              gc.selectScreen(index);
             },
             sheetChild: GetAppointments(),
             items: itemsIcons,
-            controller: _bottomBarController,
+            controller: dcCtr.bottomBarController,
             mainActionButtonTheme: MainActionButtonTheme(
               icon: Icon(Icons.library_books_sharp,color: Colors.white,)
             ),

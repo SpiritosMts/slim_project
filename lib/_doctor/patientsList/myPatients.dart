@@ -36,18 +36,19 @@ class _MyPatientsState extends State<MyPatients> {
         elevation: 10,
         actions: [
           GetBuilder<DoctorHomeCtr>(
-              id: 'appBar',
-              builder: (_) {
+              builder: (gc) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 5.0),
                   child: badges.Badge(
                     badgeStyle: badges.BadgeStyle(badgeColor: Colors.redAccent),
-                    showBadge: dcCtr.notifNum >0 ?true:false,
+                    showBadge: gc.showNotifBadge,
                     position: badges.BadgePosition.custom(start: 25),
-                    badgeContent: Text(dcCtr.notifNum.toString()),
+                    badgeContent: Text('1',style: TextStyle(color: Colors.white),),
                     child: IconButton(
                       onPressed: () {
-                        dcCtr.selectScreen(4);
+                        gc.selectScreen(4);
+                        gc.toggleNotif(false);
+
                       },
                       icon: Icon(Icons.notifications,color: Colors.white,),
                     ),
@@ -59,17 +60,18 @@ class _MyPatientsState extends State<MyPatients> {
       ),
       body: backGroundTemplate(
         child: GetBuilder<DoctorHomeCtr>(
-          builder: (_)=>(dcCtr.myPatientsMap.isNotEmpty)
+          builder: (gc) {
+            return (gc.myPatientsMap.isNotEmpty)
               ? ListView.builder(
               itemExtent: 130,
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
               shrinkWrap: true,
-              itemCount: dcCtr.myPatientsMap.length,
+              itemCount: gc.myPatientsMap.length,
               itemBuilder: (BuildContext context, int index) {
-                String key = dcCtr.myPatientsMap.keys.elementAt(index);
-                return patientCard(dcCtr.myPatientsMap[key]!,authCtr.cUser.patients);
+                String key = gc.myPatientsMap.keys.elementAt(index);
+                return patientCard(gc.myPatientsMap[key]!,dcCtr.myPatientsMap.keys.toList());
               }
-          ):dcCtr.loadingUsers?
+          ):gc.loadingUsers?
           Center(
             child: CircularProgressIndicator(),
           )
@@ -82,7 +84,8 @@ class _MyPatientsState extends State<MyPatients> {
                     fontWeight: FontWeight.w700
                 ),
               ))
-          ),
+          );
+          },
 
         ),
       )

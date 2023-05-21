@@ -16,6 +16,7 @@ class _MapMarkerState extends State<MapMarker> {
   final Completer<GoogleMapController> gMapctr = Completer();
 
   LatLng pos = Get.arguments['pos'];
+  String patName = Get.arguments['patName'];
 
   @override
   void initState() {
@@ -37,7 +38,7 @@ class _MapMarkerState extends State<MapMarker> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Patient Location"),
+        title: Text("$patName's Location"),
         centerTitle: true,
         backgroundColor: Color(0xff024855),
         elevation: 10,

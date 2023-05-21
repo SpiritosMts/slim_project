@@ -51,8 +51,9 @@ class ScUser {
   });
 }
 
-Future<ScUser> getUserByID(id) async {
-  if(id == '') return ScUser();
+Future<ScUser> getUserByID(String id) async {
+
+  if(id == '' || id.length != 20 ) return ScUser();
   final event = await usersColl.where('id', isEqualTo: id).get();
   var doc = event.docs.single;
   return ScUserFromMap(doc);
@@ -89,7 +90,6 @@ ScUser ScUserFromMap(userDoc){
   user.appointments = userDoc.get('appointments');
   user.notifications = userDoc.get('notifications');
   user.hasPatients = user.patients.isNotEmpty;
-
 
   return user;
 }

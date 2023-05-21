@@ -17,9 +17,9 @@ Future<List<String>> getChildrenKeys(String ref) async {
     snapshot.children.forEach((element) {
       children.add(element.key.toString());
     });
-    print('## <$ref> exists with [${children.length}] children');
+    //print('## <$ref> exists with [${children.length}] children');
   } else {
-    print('## <$ref> DONT exists');
+    //print('## <$ref> DONT exists');
   }
   return children;
 }
@@ -251,31 +251,31 @@ addDoc(CollectionReference coll) async {
     print("## Failed to add document: $e");
   });
 }
-updateDoc(CollectionReference coll,docID,Map<String, dynamic> mapToUpdate) async {
-  // Map<String, dynamic> mapToUpdate = {
-  //   'null': null,
-  //   'string': 'hh',
-  //   'number': 4.5,
-  //   'geopoint': const GeoPoint(0.1,4.5),
-  //   'map': {
-  //     'key0':'value0',
-  //     'key1':'value1',
-  //     'key2':'value2',
-  //   },
-  //   'list':[
-  //     'item0',
-  //     'item1',
-  //     'item2',
-  //   ]
-  // };
-
-  coll.doc(docID).update(mapToUpdate).then((value) async {
-
-    print("### doc with id:<$docID> updated ");
-  }).catchError((e) async {
-    print("## Failed to update document: $e");
-  });
-}
+// updateDoc(CollectionReference coll,docID,Map<String, dynamic> mapToUpdate) async {
+//   // Map<String, dynamic> mapToUpdate = {
+//   //   'null': null,
+//   //   'string': 'hh',
+//   //   'number': 4.5,
+//   //   'geopoint': const GeoPoint(0.1,4.5),
+//   //   'map': {
+//   //     'key0':'value0',
+//   //     'key1':'value1',
+//   //     'key2':'value2',
+//   //   },
+//   //   'list':[
+//   //     'item0',
+//   //     'item1',
+//   //     'item2',
+//   //   ]
+//   // };
+//
+//   coll.doc(docID).update(mapToUpdate).then((value) async {
+//
+//     print("### doc with id:<$docID> updated ");
+//   }).catchError((e) async {
+//     print("## Failed to update document: $e");
+//   });
+// }
 getDocProps(CollectionReference coll,docID)async{
   await coll.doc(docID).get().then((docSnap) {
     num number = docSnap.get('number');

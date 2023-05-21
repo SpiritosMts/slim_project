@@ -13,18 +13,24 @@ import '../../manager/myVoids.dart';
 class PatientsListCtr extends GetxController {
 
 
+  StreamSubscription? allPatsSubscription;
 
 @override
 void onInit() {
   super.onInit();
-  print('## init AllPatientsCtr');
+ // print('## init AllPatientsCtr');
   Future.delayed(const Duration(seconds: 0), () {
-    getUsersData(printDet: true);
+    //getUsersData(printDet: true);
+    listenToAllPats();
     //streamingDoc(usersColl,authCtr.cUser.id!);
   });
 }
 
-
+  @override
+  void onClose() {
+    super.onClose();
+    allPatsSubscription!.cancel();
+  }
 
 
   Map<String, ScUser> userMap = {};
@@ -35,14 +41,46 @@ void onInit() {
   bool typing = false;
 
 
+void listenToAllPats() {
+
+
+  allPatsSubscription = FirebaseFirestore.instance.collection('sc_users').where('role', isEqualTo: 'patient')
+      .where('doctorAttachedID', isEqualTo: '')
+      .snapshots()
+      .listen((event) {
+
+          List<DocumentSnapshot> usersData = event.docs;
+          // Remove any existing users
+          userMap.clear();
+
+          //fill user map
+          for (var _user in usersData) {
+            //fill userMap
+            userMap[_user.id] = ScUserFromMap(_user);
+          }
+
+          userList = userMap.entries.map( (entry) => entry.value).toList();
+          foundUsersList = userList;
+          shouldLoad=false;
+           print('## < ${userMap.length} > users loaded from firestore');
+          update();
+
+        },
+    onError: (error) => print("## allPats Listen failed: $error"),
+  );
+
+
+
+
+}
 
 
   getUsersData({bool printDet = false}) async {
     shouldLoad=true;
 
     if (printDet) print('## downloading users from fireBase...');
-    List<DocumentSnapshot> usersData = await getDocumentsByColl(usersColl
-            .where('role', isEqualTo: 'patient')//filter only patients
+    List<DocumentSnapshot> usersData = await getDocumentsByColl(
+        usersColl.where('role', isEqualTo: 'patient')//filter only patients
             .where('doctorAttachedID', isEqualTo: '')// patient that not attached to any doctor
     );
 
@@ -58,7 +96,7 @@ void onInit() {
     userList = userMap.entries.map( (entry) => entry.value).toList();
     foundUsersList = userList;
     shouldLoad=false;
-    if (printDet) print('## < ${userMap.length} > users loaded from database');
+    if (printDet) print('## < ${userMap.length} > users loaded from firestore');
     update();
 
   }
@@ -80,12 +118,17 @@ void onInit() {
   addPatient(ScUser patient) async {
     String patID = patient.id!;
     String dctrID = authCtr.cUser.id!;
+
+    updateDoc(usersColl, patID, {'doctorAttachedID': dctrID});
+
     //add patient to doctor
-    await addElementsToList([patID], 'patients', dctrID, 'sc_users');
+    await addElementsToList([patID], 'patients', dctrID, 'sc_users').then((value) {
+      showSnack("${patient.name} added to my patients list");
+
+    });
 
     //add doctor to patient
-    updateDoc(usersColl, patID, {'doctorAttachedID': dctrID});
-    authCtr.refreshCuser();///refresh
+    //authCtr.refreshCuser();///refresh-user
     //refresh curr user
     //authCtr.refreshCuser();
     //Get.back();
@@ -94,13 +137,17 @@ void onInit() {
   removePatient(ScUser patient) async {
     String patID = patient.id!;
     String dctrID = patient.doctorAttachedID!;
+    updateDoc(usersColl, patID, {'doctorAttachedID': ''});
+
     //remove patient to doctor
-    removeElementsFromList([patID], 'patients', dctrID, 'sc_users');
+    removeElementsFromList([patID], 'patients', dctrID, 'sc_users').then((value) {
+      showSnack("${patient.name} removed from my patients list",color: Colors.redAccent.withOpacity(0.8));
+
+    });
 
     //remove doctor to patient
-    updateDoc(usersColl, patID, {'doctorAttachedID': ''});
     //refresh curr user
-    authCtr.refreshCuser();///refresh
+    //authCtr.refreshCuser();///refresh
 
     //Get.back();
   }

@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:alarm/alarm.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -14,50 +15,167 @@ import '../../main.dart';
 import '../../manager/myVoids.dart';
 import '../../manager/styles.dart';
 import '../../models/user.dart';
+import '../_doctor/notifications/awesomeNotif.dart';
+import '../alarm/alarm.dart';
 
 class ChartsCtr extends GetxController{
   static ChartsCtr instance = Get.find();
   updateCtr(){
-    update(['appBar']);
-    update(['chart']);
+    update();
+    // dcCtr.updateCtr();
+    // dcCtr.update();
+    // ptCtr.updateCtr();
+    // ptCtr.update();
   }
 
 
-  String? selectedServer ;
+  String selectedServer ='';
 
+  bool isConnected = true;
 
+  Color chartLineNormalColor = Colors.green;
+  Color chartLineDangerColor = Colors.red;
 
-
+  double maxSafeZone = (Random().nextDouble() * (95 - (70)) + (70));
+  double minSafeZone = 60;
+  bool shouldSnooze = false;
+  bool isInDanger = false;
 
 
   /// /////////////////////////////////////////::
   @override
   void onInit() {
     super.onInit();
-    print('## init ChartsCtr');
+    print('## init ChartsCtr##');
     Future.delayed(const Duration(milliseconds: 200), () async {//time to start readin data
       periodicFunction();
+      updateCtr();
       //changeServer(authCtr.cUser.id);/// start streamData
     });
   }
-  @override
-  void onClose() {
-    super.onClose();
-    print('## close ChartsCtr');
+
+  /// #####################################################################################"
+
+
+  void alertUser(String bpm){
+
+    String usrInDanger = 'patient';
+    String idNotifRecever = authCtr.cUser.id!;
+    print('## $selectedServer ');
+    if(authCtr.cUser.role == 'doctor'){
+      usrInDanger = dcCtr.myPatientsMap[selectedServer]!.name!;
+    }else{
+      usrInDanger = authCtr.cUser.name!;
+    }
+    print('## alerting user ....(usr-In-Danger <$usrInDanger>) ');
+
+    sendNotif(idNotifRecever: idNotifRecever, name: usrInDanger, bpm: bpm );
 
   }
 
-  /// #####################################################################################"
+  void sendNotif({String? name,String? idNotifRecever,String? bpm }){ // just the patient do THIS
+
+    print('## sending notif ..... ');
+
+    /// /////////// Ring /////////////////////
+    DateTime now =  DateTime.now();
+    final alarmSettings = AlarmSettings(
+      id: 42,
+      dateTime: now,
+      assetAudioPath: 'assets/sounds/alarm.mp3',
+    );
+    Alarm.set(alarmSettings: alarmSettings);
+    Future.delayed(const Duration(milliseconds: 500), () {
+      showAlarm( alarmID:alarmSettings.id  , name:name);
+    });
+    /// ///////////////////////////////
+
+    NotificationController.createNewStoreNotification('${authCtr.cUser.role == 'patient' ? 'You Have a critical state': '${name} Has  a critical state'}', 'heart condition (${bpm!} bpm)');
+
+
+
+    if(idNotifRecever!= null){
+      //if(false){
+      DateTime notifDate = DateTime.now();
+      usersColl.doc(idNotifRecever).get().then((DocumentSnapshot documentSnapshot) async {
+        if (documentSnapshot.exists) {
+          Map<String, dynamic> notifs = documentSnapshot.get('notifications');
+
+          int notifsNum = notifs.length;
+          notifs[notifsNum.toString()] = {
+            'lat': '35.1485',
+            'lng': '10.16446',
+            'new': true,
+            'usrName': name,
+            // 'usrID': id,
+            'bpm': bpm,
+            'time': '${DateFormat("hh:mm a").format(notifDate)}',
+            'day': '${notifDate.day.toString().padLeft(2, '0')}',
+            'month': '${getMonthName(notifDate.month)}',
+          };
+
+          //add raters again map to cloud
+          await usersColl.doc(authCtr.cUser.id).update({
+            'notifications': notifs,
+          }).then((value) async {
+            //Get.back();
+
+
+
+            if(authCtr.cUser.role == 'patient' ){
+              ptCtr.toggleNotif(true);
+
+
+            }else {
+
+              dcCtr.toggleNotif(true);
+
+            }
+            print('## notifications sent');
+            showSnack('notification sent'.tr, color: Colors.black54);
+          }).catchError((error) async {
+            print('## notifications sending error');
+            showSnack('notifications error'.tr, color: Colors.redAccent.withOpacity(0.8));
+          });
+        }
+      });
+    }
+  }
+
+  checkDangerState(){
+    double dataNum = double.parse(bpm_data);
+    if(dataNum <= chCtr.minSafeZone || dataNum >= chCtr.maxSafeZone){
+
+      //print('## GO TO ---CRITICATL--- STATE');
+
+      isInDanger = true;
+      if(shouldSnooze){
+        alertUser('195');
+        print('## --- S N O O Z E --- ');
+        shouldSnooze = false;
+      }
+    }else{
+      //print('## GO TO NORMAL STATE');
+      isInDanger = false;
+      shouldSnooze = true;
+    }
+  }
+
+
+  void toggleConnection() {
+    //alertUser('159');
+    isConnected = !isConnected;
+    updateCtr();
+  }
 
 
   bool chartLoading = true;
   changeServer(server) async {
     chartLoading = true;
 
-    selectedServer = '';
-    //if (servers.isEmpty) return;
+    //if (servers.isEmpty && authCtr.cUser.role =='doctor') return;
     selectedServer = server;
-    print('## selected server = ${selectedServer}');
+    print('## changed server to=> << ${selectedServer} >>');
     if(streamData != null) await streamData!.cancel();
     realTimeListen();
     initHistoryValues('patients/$selectedServer/bpm_history');
@@ -179,11 +297,11 @@ class ChartsCtr extends GetxController{
   List bpm_history = [];//{time,value}
   List<String> bpm_times = [];//time
   List<String> bpm_values = [];//value
-  bool loadingHis = true;
+  //bool loadingHis = true;
 
   /// ///
   initHistoryValues(String historyPath) async {
-    loadingHis=true;
+    //loadingHis=true;
 
     bpm_history = [];//{time,value}
     bpm_times = [];//time
@@ -193,12 +311,12 @@ class ChartsCtr extends GetxController{
     bpm_history = await getHistoryData(historyPath); /// path history
     bpm_values = bpm_history.map((map) => map['value'].toDouble().toString()).toList();
     bpm_times = bpm_history.map((map) => map['time'].toString() ).toList();
-    debugPrint('## bpm_history<${bpm_history.length}>// bpm_times<${bpm_times.length}>//  bpm_values<${bpm_values.length}><${bpm_values}>');
-    debugPrint('## max<${getMaxValue(bpm_values)}> / min<${getMinValue(bpm_values)}>');
+    //debugPrint('## bpm_history<${bpm_history.length}>// bpm_times<${bpm_times.length}>//  bpm_values<${bpm_values.length}><${bpm_values}>');
+    //debugPrint('## max<${getMaxValue(bpm_values)}> / min<${getMinValue(bpm_values)}>');
 
 
 
-    loadingHis =false;
+    //loadingHis =false;
     updateCtr();
 
   }
@@ -241,8 +359,6 @@ class ChartsCtr extends GetxController{
 
     return spots;
   }
-
-
   deleteFirstValues(int deleteCount,String type) async {
     DatabaseReference gasRef = database!.ref('patients/$selectedServer/bpm_history');
 
@@ -260,7 +376,6 @@ class ChartsCtr extends GetxController{
 
     });
   }
-
   Future<void> deleteHisDialog(String type,List hisList) {
     TextEditingController _textEditingController = TextEditingController();
     final _serverFormKey = GlobalKey<FormState>();

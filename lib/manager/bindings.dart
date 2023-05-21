@@ -16,16 +16,27 @@ class GetxBinding implements Bindings {
   @override
   void dependencies() {
 
-    Get.put(AuthController());
+    Get.put<AuthController>(AuthController());
 
-    //MyLocaleCtr langCtr =   Get.put(MyLocaleCtr()); //MAIN
+
+    //Get.put<PatientHomeCtr>(PatientHomeCtr());
+    //Get.put<DoctorHomeCtr>(DoctorHomeCtr());
+    //Get.put<ChartsCtr>(ChartsCtr());
+
+
+
+
+
+    Get.lazyPut<ChartsCtr>(() => ChartsCtr(), fenix: true);
+    Get.lazyPut<DoctorHomeCtr>(() => DoctorHomeCtr(),fenix: true);
+    Get.lazyPut<PatientHomeCtr>(() => PatientHomeCtr(),fenix: true);
+
+
+
 
     Get.lazyPut<PatientsListCtr>(() => PatientsListCtr(),fenix: true);
-    Get.lazyPut<PatientHomeCtr>(() => PatientHomeCtr(),fenix: true);
-    Get.lazyPut<DoctorHomeCtr>(() => DoctorHomeCtr(),fenix: true);
-    Get.lazyPut<ChatRoomCtr>(() => ChatRoomCtr(),fenix: true);
-    Get.lazyPut<ChartsCtr>(() => ChartsCtr(),fenix: true);
 
+    Get.lazyPut<ChatRoomCtr>(() => ChatRoomCtr(),fenix: true);
 
     //print("## getx dependency injection completed (Get.put() )");
 
