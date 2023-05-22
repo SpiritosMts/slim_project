@@ -150,7 +150,10 @@ class ChartsCtr extends GetxController{
 
       isInDanger = true;
       if(shouldSnooze){
-        alertUser('195');
+
+        Future.delayed(const Duration(milliseconds: 500), () {
+          alertUser('195');
+        });
         print('## --- S N O O Z E --- ');
         shouldSnooze = false;
       }
@@ -176,9 +179,11 @@ class ChartsCtr extends GetxController{
     //if (servers.isEmpty && authCtr.cUser.role =='doctor') return;
     selectedServer = server;
     print('## changed server to=> << ${selectedServer} >>');
-    if(streamData != null) await streamData!.cancel();
-    realTimeListen();
-    initHistoryValues('patients/$selectedServer/bpm_history');
+    if(selectedServer!=''){
+      if(streamData != null) await streamData!.cancel();
+      realTimeListen();
+      initHistoryValues('patients/$selectedServer/bpm_history');
+    }
 
     chartLoading = false;
     updateCtr();
@@ -335,9 +340,9 @@ class ChartsCtr extends GetxController{
 
       });
 
-      print('## <${dataTypePath}>history exists with <${dataHis.length}> values');
+      //print('## <${dataTypePath}>history exists with <${dataHis.length}> values');
     } else {
-      print('## <${dataTypePath}> history DONT exists');
+      //print('## <${dataTypePath}> history DONT exists');
     }
 
     updateCtr();

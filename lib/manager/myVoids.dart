@@ -40,7 +40,7 @@ ChartsCtr get chCtr => Get.find<ChartsCtr>();
 DoctorHomeCtr get dcCtr => Get.find<DoctorHomeCtr>();
 PatientHomeCtr get ptCtr => Get.find<PatientHomeCtr>();
 
-PatientsListCtr get patListCtr => Get.find<PatientsListCtr>();
+//PatientsListCtr get patListCtr => Get.find<PatientsListCtr>();
 
 FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 FirebaseDatabase? get fbDatabase => FirebaseDatabase.instance;

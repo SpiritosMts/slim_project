@@ -34,7 +34,7 @@ class GetxBinding implements Bindings {
 
 
 
-    Get.lazyPut<PatientsListCtr>(() => PatientsListCtr(),fenix: true);
+   // Get.lazyPut<PatientsListCtr>(() => PatientsListCtr(),fenix: true);
 
     Get.lazyPut<ChatRoomCtr>(() => ChatRoomCtr(),fenix: true);
 

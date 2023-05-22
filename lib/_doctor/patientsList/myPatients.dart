@@ -21,8 +21,6 @@ class MyPatients extends StatefulWidget {
 }
 
 class _MyPatientsState extends State<MyPatients> {
-  final PatientsListCtr gc = Get.find<PatientsListCtr>();
-
 
   @override
   Widget build(BuildContext context) {

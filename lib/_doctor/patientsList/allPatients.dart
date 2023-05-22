@@ -10,6 +10,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../manager/myVoids.dart';
 import '../../manager/styles.dart';
+import '../home/doctorHome_ctr.dart';
 
 class AllPatientsView extends StatefulWidget {
   @override
@@ -17,7 +18,7 @@ class AllPatientsView extends StatefulWidget {
 }
 
 class _AllPatientsViewState extends State<AllPatientsView> {
-  final PatientsListCtr gc = Get.find<PatientsListCtr>();
+  final DoctorHomeCtr gc = Get.find<DoctorHomeCtr>();
 
 
   searchAppBar() {
@@ -26,7 +27,7 @@ class _AllPatientsViewState extends State<AllPatientsView> {
       automaticallyImplyLeading: false, // Hide the back button
       centerTitle: true,
       elevation: 10,
-      title: GetBuilder<PatientsListCtr>(
+      title: GetBuilder<DoctorHomeCtr>(
         //id: 'appBar',
           builder: (_) {
             return gc.typing
@@ -86,7 +87,7 @@ class _AllPatientsViewState extends State<AllPatientsView> {
                 : Text('Patients List');
           }),
       actions: <Widget>[
-        GetBuilder<PatientsListCtr>(
+        GetBuilder<DoctorHomeCtr>(
           //id: 'appBar',
             builder: (_) {
               return !gc.typing
@@ -117,7 +118,7 @@ class _AllPatientsViewState extends State<AllPatientsView> {
     return Scaffold(
       appBar: searchAppBar(),
       body: backGroundTemplate(
-        child: GetBuilder<PatientsListCtr>(
+        child: GetBuilder<DoctorHomeCtr>(
           builder: (_) => (gc.foundUsersList.isNotEmpty)
               ? ListView.builder(
             //itemExtent: 130,

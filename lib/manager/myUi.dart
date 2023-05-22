@@ -409,7 +409,6 @@ Widget patientCard(ScUser user, List<dynamic> doctrPats) {
                     onPressed: () {
                       addPatient(user);
                       dcCtr.updateCtr();
-                      patListCtr.update();
                     },
                   ),
                 ),
@@ -454,8 +453,11 @@ Widget patientCard(ScUser user, List<dynamic> doctrPats) {
                     ).then((toAllow) {// if admin accept
                       if (toAllow) {
                         removePatient(user);
-                        dcCtr.updateCtr();
-                        patListCtr.update();
+                        Future.delayed(const Duration(milliseconds: 500), () {
+                          dcCtr.updateCtr();
+
+
+                        });
 
                       }
                     });

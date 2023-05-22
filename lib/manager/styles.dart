@@ -13,6 +13,7 @@ final myTheme = ThemeData(
 // Define the palette colors
 const Color primaryColor = Color(0xFF0097A7);
 const Color secondaryColor = Color(0xFFB2EBF2);
+const Color introBackColor = Color(0xFFCCF6FB);
 const Color accentColor = Color(0xFF006064);
 const Color accentColor0   = Color(0xFF024855);
 const Color dialogsCol = secondaryColor;

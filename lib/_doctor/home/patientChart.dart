@@ -21,9 +21,7 @@ class PatientChart extends StatefulWidget {
 }
 
 class _PatientChartState extends State<PatientChart> {
-
   //final DoctorHomeCtr gc = Get.put<DoctorHomeCtr>(DoctorHomeCtr());
-
 
   /// /////////////////////////////////////////////////////////////////////////////////////
 
@@ -31,68 +29,71 @@ class _PatientChartState extends State<PatientChart> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
         //centerTitle: gc.myPatients.isNotEmpty? false:true,
-        automaticallyImplyLeading:false,
+        automaticallyImplyLeading: false,
         elevation: 10,
         backgroundColor: appbarColor,
-        title:  Padding(
+        title: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text('smartCare', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
-           textStyle:  TextStyle(
-           fontSize: 23  ,
-               color: Colors.white,
-               fontWeight: FontWeight.w700
-           ),
-           )),
+          child: Text('smartCare',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.indieFlower(
+                textStyle: TextStyle(fontSize: 23, color: Colors.white, fontWeight: FontWeight.w700),
+              )),
         ),
-        actions:<Widget>[
+        actions: <Widget>[
           GetBuilder<DoctorHomeCtr>(
               //id:'appBar',
               builder: (gc) {
-                return  gc.myPatientsMap.isNotEmpty?  Padding(
-                  padding: const EdgeInsets.only(top: 5.0),
-                  child: DropdownButton<String>(
-                    icon: Icon(Icons.arrow_drop_down, color: Colors.white),
-                    underline: Container(),
-                    dropdownColor: primaryColor,
-                   // value:(gc.selectedServer!='' && gc.myPatients.isNotEmpty)? gc.myPatients[gc.selectedServer]!.name : 'no patients',
-                    value:chCtr.selectedServer,
-                    //value:'name',
-                    items:gc.myPatientsMap.keys.map((String id) {
-                      // ScUser? pat = gc.myPatients[id];
-                       String patName = gc.myPatientsMap[id]!.name!;
-                      print('## (dropdown) pat-ID: $id');
-                      //print('## pat-name: $patName');
-                       //String patName = 'name';
+                //&& chCtr.selectedServer != ''
+            return gc.myPatientsMap.isNotEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 5.0),
+                    child: DropdownButton<String>(
+                      icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                      underline: Container(),
+                      dropdownColor: primaryColor,
+                      // value:(gc.selectedServer!='' && gc.myPatients.isNotEmpty)? gc.myPatients[gc.selectedServer]!.name : 'no patients',
+                      value: chCtr.selectedServer,
+                      //value:'name',
+                      items: gc.myPatientsMap.keys.map((String id) {
+                        // ScUser? pat = gc.myPatients[id];
+                        String patName = gc.myPatientsMap[id]!.name!;
+                        //print('## (dropdown) pat-ID: $id');
+                        //print('## pat-name: $patName');
+                        //String patName = 'name';
+                        return DropdownMenuItem<String>(
+                          value: id,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                patName,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (id) {
+                        if(id != chCtr.selectedServer){
+                          print('## (dropdown) select: $id');
+                          gc.updateCtr();
+                          Future.delayed(const Duration(milliseconds: 200), () {
+                            chCtr.changeServer(id);
+                          });
+                          Future.delayed(const Duration(milliseconds: 200), () {
+                            gc.updateCtr();
 
-                      return DropdownMenuItem<String>(
-                        value: id ,
-                        child:  Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              patName,
-                              //patName,
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      Future.delayed(const Duration(milliseconds: 800), () {
-                        gc.updateCtr();
+                          });
+                        }
 
-                        chCtr.changeServer(newValue);
 
-                      });
-
-                    },
-                  ),
-                ):Container();
-              }
-          ),
+                      },
+                    ),
+                  )
+                : Container();
+          }),
         ],
       ),
       body: backGroundTemplate(

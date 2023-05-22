@@ -47,17 +47,19 @@ class IntroScreenState extends State<IntroScreen> {
   Widget build(BuildContext context) {
     const bodyStyle = TextStyle(fontSize: 19.0);
 
-    const pageDecoration = PageDecoration(
+    var pageDecoration = PageDecoration(
       titleTextStyle: TextStyle(fontSize: 28.0, fontWeight: FontWeight.w700),
       bodyTextStyle: bodyStyle,
       bodyPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-      pageColor: Colors.white,
+      //pageColor: appbarColor.withOpacity(0.2),
       imagePadding: EdgeInsets.zero,
+
     );
 
     return IntroductionScreen(
+
       key: introKey,
-      globalBackgroundColor: Colors.white,
+      globalBackgroundColor: introBackColor,
       allowImplicitScrolling: true,
       //autoScrollDuration: 3000,
       globalHeader: Align(
@@ -147,58 +149,58 @@ class IntroScreenState extends State<IntroScreen> {
         ),
 
         PageViewModel(
-            title: "Categorize your contacts".tr,
-          body: "This application will allow you to categorize your contacts into certain categories.".tr,
-          image: _buildImage('communicate.png'),
+            title: "Real-time Tracking".tr,
+          body: "Stay informed about your heart health ,real-time heart rate monitoring at your fingertips.".tr,
+          image: _buildImage('heart.png'),
           decoration: pageDecoration,
         ),
         PageViewModel(
-          title: "Edit categories".tr,
+          title: "Secure Communication".tr,
           body:
-          "You can edit aany category after creating it.".tr,
-          image: _buildImage('edit.png'),
+          "connect with your assigned doctor through a secure and private chat system for personalized consultations and timely support.".tr,
+          image: _buildImage('chat.png'),
           decoration: pageDecoration,
         ),
         PageViewModel(//search
-          title: "Make a search".tr,
+          title: "Intelligent Insights".tr,
           body:
-          "You can search for specific contacts.".tr,
-          image: _buildImage('search.png'),
+          "Our advanced AI model intelligently adapts heart rate thresholds based on your activities and ensuring accurate health monitoring.".tr,
+          image: _buildImage('ai.png'),
           decoration: pageDecoration,
         ),
 
-        PageViewModel(
-          title: 'Let\'s Begin ... '.tr,
-          bodyWidget: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children:  [
-              Text("Click on".tr, style: bodyStyle),
-              SizedBox(width: 7),
-              SizedBox(
-                width: 20,
-                child: Image.asset(
-                       'assets/images/add.png',
-                ),
-              ),
-              SizedBox(width: 7),
-              Text("to add new category".tr, style: bodyStyle),
-
-            ],
-          ),
-          decoration: pageDecoration.copyWith(
-            bodyFlex: 2,
-            imageFlex: 4,
-            bodyAlignment: Alignment.bottomCenter,
-            imageAlignment: Alignment.topCenter,
-          ),
-          //image: _buildImage('transaction.png'),
-
-          image: Padding(
-            padding: const EdgeInsets.only(top: 57.0),
-            child: Image.asset('assets/images/operator.png', width: 200),
-          ),
-          reverse: true,
-        ),
+        // PageViewModel(
+        //   title: 'Let\'s Begin ... '.tr,
+        //   bodyWidget: Row(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children:  [
+        //       Text("Click on".tr, style: bodyStyle),
+        //       SizedBox(width: 7),
+        //       SizedBox(
+        //         width: 20,
+        //         child: Image.asset(
+        //                'assets/images/add.png',
+        //         ),
+        //       ),
+        //       SizedBox(width: 7),
+        //       Text("to add new category".tr, style: bodyStyle),
+        //
+        //     ],
+        //   ),
+        //   decoration: pageDecoration.copyWith(
+        //     bodyFlex: 2,
+        //     imageFlex: 4,
+        //     bodyAlignment: Alignment.bottomCenter,
+        //     imageAlignment: Alignment.topCenter,
+        //   ),
+        //   //image: _buildImage('transaction.png'),
+        //
+        //   image: Padding(
+        //     padding: const EdgeInsets.only(top: 57.0),
+        //     child: Image.asset('assets/images/operator.png', width: 200),
+        //   ),
+        //   reverse: true,
+        // ),
       ],
       onDone: () => _onIntroEnd(context),
       //onSkip: () => _onIntroEnd(context), // You can override onSkip callback

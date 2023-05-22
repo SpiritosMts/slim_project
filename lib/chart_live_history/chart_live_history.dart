@@ -286,6 +286,7 @@ SideTitles  bottomTimeTitles(int eachTime, List<String> timeList) { //gas_times
       //   break;
 
       }
+      if(value.toInt()==0) bottomText='';
 
       return Text(
         bottomText,
@@ -318,7 +319,7 @@ Widget chartGraph({Color? bgCol,int valueInterval = 50, SideTitles? bottomTitles
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
            // Text(ptCtr.getStringStream as String,style: TextStyle(color: Colors.white),),
-            RippleAnimation(
+            if(chCtr.isConnected) RippleAnimation(
               child: Container(
                 //color:Colors.green,
                width: 5,
