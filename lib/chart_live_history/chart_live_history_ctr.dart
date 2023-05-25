@@ -36,7 +36,9 @@ class ChartsCtr extends GetxController{
   Color chartLineNormalColor = Colors.green;
   Color chartLineDangerColor = Colors.red;
 
-  double maxSafeZone = (Random().nextDouble() * (95 - (70)) + (70));
+
+  //(Random().nextDouble() * (95 - (70)) + (70))
+  double maxSafeZone =80 ;
   double minSafeZone = 60;
   bool shouldSnooze = false;
   bool isInDanger = false;
@@ -164,6 +166,10 @@ class ChartsCtr extends GetxController{
     }
   }
 
+
+  aiCalculate(int age,){
+
+  }
 
   void toggleConnection() {
     //alertUser('159');
