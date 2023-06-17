@@ -67,7 +67,7 @@ class _NotificationsState extends State<Notifications> {
                     return notifCard(key, notifications[key]);
                   }
               ):Center(
-                child: Text('no notifications found', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
+                child: Text('no notifications found'.tr, textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
                   textStyle:  TextStyle(
                       fontSize: 23  ,
                       color: Colors.white,

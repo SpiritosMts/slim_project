@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:alarm/alarm.dart';
+import 'package:circular_chart_flutter/circular_chart_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -17,8 +18,9 @@ import '../../manager/styles.dart';
 import '../../models/user.dart';
 import '../_doctor/notifications/awesomeNotif.dart';
 import '../alarm/alarm.dart';
+import '../manager/test/chaa.dart';
 
-class ChartsCtr extends GetxController{
+class ChartsCtr extends GetxController with GetSingleTickerProviderStateMixin{
   static ChartsCtr instance = Get.find();
   updateCtr(){
     update();
@@ -36,26 +38,121 @@ class ChartsCtr extends GetxController{
   Color chartLineNormalColor = Colors.green;
   Color chartLineDangerColor = Colors.red;
 
-
+  late Timer periodicTimer ;
   //(Random().nextDouble() * (95 - (70)) + (70))
-  double maxSafeZone =80 ;
-  double minSafeZone = 60;
+  double maxSafeZone = 100 ;
+  double minSafeZone = 0;
   bool shouldSnooze = false;
   bool isInDanger = false;
+  bool isTrainig = false;
+  double dataPointsAverage = 0.0;
+  int aiPercentage = 0;
+  int oldAiPercentage = 0;
+  final GlobalKey aiKey = new GlobalKey();
+  AnimationController? animationController;
+  Animation<double>? animation;
 
+  double calculateAverage(List<double> numbers) {
+    if (numbers.isEmpty) {
+      return 0.0; // Return 0 if the list is empty to avoid division by zero.
+    }
+
+    double sum = 0.0;
+    for (double number in numbers) {
+      sum += number;
+    }
+
+    double average = sum / numbers.length;
+    return average;
+  }
+
+ String convertPulseToBPM(double originalValue){ //max idle 100 // max training 170
+   double minValue = 0;
+   double maxValue = 4080;
+    double newMinValue = 40;//60
+    double newMaxValue = 180;//150
+    double normalizedValue = (originalValue - minValue) / (maxValue - minValue);
+    double convertedValue = (normalizedValue * (newMaxValue - newMinValue)) + newMinValue;
+
+   // double offset = Random().nextDouble() * 50; // Adjust the range as needed
+   // convertedValue = min(convertedValue, newMaxValue - offset); // Limit the value to newMaxValue - offset
+
+
+   return formatNumberAfterComma(convertedValue.toString());
+  }
+
+  double convertGeneral( originalValue,minValue,maxValue,newMinValue,newMaxValue){
+    double normalizedValue = (originalValue - minValue) / (maxValue - minValue);
+    double convertedValue = (normalizedValue * (newMaxValue - newMinValue)) + newMinValue;
+    return convertedValue;
+
+  }
+
+   int initialRefreshTime = 3;
+  int timesToRefreshAi = 0;//changable
+  aiCalculate({List<double>? bpmDataPoints}){
+
+    int patientAge = int.parse(authCtr.cUser.age! !=''?authCtr.cUser.age!:'23' );
+    double mhr = ((220 - patientAge)*0.85); // 167
+
+    if(isConnected){
+
+
+      dataPointsAverage = calculateAverage(bpmDataPts);//16 last points = 16 sec // will take that average if stays idle
+      //print('## dataPointsAverage: $dataPointsAverage');
+
+
+
+      double maxAverage = 190;
+      double minAverage = 40;
+      maxSafeZone = convertGeneral(dataPointsAverage ,minAverage,maxAverage,100,285);
+      aiPercentage = convertGeneral(dataPointsAverage ,minAverage,maxAverage,0,100).toInt();
+
+
+      //print('## aiPercentage: $aiPercentage %');
+      if(timesToRefreshAi < 2){
+        animation = Tween<double>(begin: oldAiPercentage.toDouble(), end: aiPercentage.toDouble()).animate(animationController!);
+        //print("## animate.... <$oldAiPercentage> --${initialRefreshTime}sec--> <$aiPercentage> ");
+        timesToRefreshAi = initialRefreshTime;
+        oldAiPercentage = aiPercentage;
+        animationController!.reset();
+        animationController!.forward();
+
+        // wait 5 sec
+
+      }else{
+        timesToRefreshAi--;
+      }
+
+    }
+  }
 
   /// /////////////////////////////////////////::
   @override
   void onInit() {
     super.onInit();
     print('## init ChartsCtr##');
+
+    animationController = AnimationController(
+      duration: Duration(milliseconds: initialRefreshTime*1000),
+      vsync: this,
+    );
+    animation = Tween<double>(begin: 0, end: 1).animate(animationController!);
+
     Future.delayed(const Duration(milliseconds: 200), () async {//time to start readin data
       periodicFunction();
-      updateCtr();
+      //updateCtr();
       //changeServer(authCtr.cUser.id);/// start streamData
     });
   }
 
+  @override
+  void onClose() {
+    super.onClose();
+    animationController!.dispose();
+    periodicTimer!.cancel();
+
+  }
   /// #####################################################################################"
 
 
@@ -105,8 +202,8 @@ class ChartsCtr extends GetxController{
 
           int notifsNum = notifs.length;
           notifs[notifsNum.toString()] = {
-            'lat': '35.1485',
-            'lng': '10.16446',
+            'lat': '35.858028081225996',
+            'lng': '10.598973604225517',
             'new': true,
             'usrName': name,
             // 'usrID': id,
@@ -126,12 +223,8 @@ class ChartsCtr extends GetxController{
 
             if(authCtr.cUser.role == 'patient' ){
               ptCtr.toggleNotif(true);
-
-
             }else {
-
               dcCtr.toggleNotif(true);
-
             }
             print('## notifications sent');
             showSnack('notification sent'.tr, color: Colors.black54);
@@ -144,7 +237,7 @@ class ChartsCtr extends GetxController{
     }
   }
 
-  checkDangerState(){
+  checkDangerState(dataType){
     double dataNum = double.parse(bpm_data);
     if(dataNum <= chCtr.minSafeZone || dataNum >= chCtr.maxSafeZone){
 
@@ -152,9 +245,8 @@ class ChartsCtr extends GetxController{
 
       isInDanger = true;
       if(shouldSnooze){
-
         Future.delayed(const Duration(milliseconds: 500), () {
-          alertUser('195');
+          alertUser(dataType);
         });
         print('## --- S N O O Z E --- ');
         shouldSnooze = false;
@@ -167,12 +259,9 @@ class ChartsCtr extends GetxController{
   }
 
 
-  aiCalculate(int age,){
 
-  }
 
   void toggleConnection() {
-    //alertUser('159');
     isConnected = !isConnected;
     updateCtr();
   }
@@ -200,7 +289,7 @@ class ChartsCtr extends GetxController{
 
   /// //////////: LIVE ///////////////////////////
   StreamSubscription<DatabaseEvent>? streamData;
-  String bpm_data = '0.0';
+  String bpm_data = '70.0';
   int xIndexs = 0;
   List<double> bpmDataPts = [
     60.0, 70.0, 80.0, 90.0, 100.0,60.0, 70.0, 80.0, 90.0, 100.0,60.0, 70.0, 80.0, 90.0, 100.0,60.0,
@@ -268,7 +357,7 @@ class ChartsCtr extends GetxController{
     return spots;
   }
   periodicFunction() {
-    Timer.periodic(Duration(milliseconds: 1000), (timer) {
+    periodicTimer = Timer.periodic(Duration(milliseconds: 1000), (timer) {
 
       //print('## type value : ${bpm_data.runtimeType}');
       updateDataPoints(double.parse(bpm_data));///from fb
@@ -276,7 +365,7 @@ class ChartsCtr extends GetxController{
       if(b<normalPersonBpm.length-1) {
         b++;
       }else{b=0;}
-
+      aiCalculate();
       updateCtr();
 
     });
@@ -292,7 +381,7 @@ class ChartsCtr extends GetxController{
 
       int bpmInt = event.snapshot.child('bpm_once').value as int;
 
-      bpm_data = bpmInt.toString();
+      bpm_data = convertPulseToBPM(bpmInt.toDouble());
       double settedDouble  =0.0;
       //print('## LAST-bpm-value:$bpm_data');
       //print('## LAST-bpm-type:${bpm_data.runtimeType}');
@@ -320,7 +409,7 @@ class ChartsCtr extends GetxController{
 
 
     bpm_history = await getHistoryData(historyPath); /// path history
-    bpm_values = bpm_history.map((map) => map['value'].toDouble().toString()).toList();
+    bpm_values = bpm_history.map((map) => convertPulseToBPM(map['value'].toDouble())).toList();
     bpm_times = bpm_history.map((map) => map['time'].toString() ).toList();
     //debugPrint('## bpm_history<${bpm_history.length}>// bpm_times<${bpm_times.length}>//  bpm_values<${bpm_values.length}><${bpm_values}>');
     //debugPrint('## max<${getMaxValue(bpm_values)}> / min<${getMinValue(bpm_values)}>');
@@ -341,6 +430,7 @@ class ChartsCtr extends GetxController{
     if (snapshot.exists) {
       snapshot.children.forEach((element) {
         //print('## ele ${element.key}');
+
         dataHis.add(element.value);
         //print('## type... <${element.value.runtimeType}>');
 
@@ -355,15 +445,15 @@ class ChartsCtr extends GetxController{
     //print('## <<${dataHis.length}>> hisValues=<$dataHis> ');
     return dataHis;
   }
-  List<FlSpot> generateHistorySpots(List dataList) {
+  List<FlSpot> generateHistorySpots(List valList) {
     //print('## generate spots...');
     List<FlSpot> spots = [];
-    for (int i = 0 ; i < dataList.length ; i++) {
+    for (int i = 0 ; i < valList.length ; i++) {
       //bool isLast = i % spots.length == 0;
       spots.add(
           FlSpot(
               i.toDouble(), // X
-              double.parse(dataList[i]['value'].toString()) // Y
+              double.parse(valList[i].toString()) // Y
           )
       );
     }

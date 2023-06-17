@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:smart_care/manager/auth/login.dart';
@@ -26,11 +27,12 @@ class _RegisterState extends State<Register> {
   final nameTec = TextEditingController();
 
   final phoneTec = TextEditingController();
+  final taxTec = TextEditingController();
   final espCodeTec = TextEditingController();
   final specialityTec = TextEditingController();
   final addressTec = TextEditingController();
   final ageTec = TextEditingController();
-  String sex = 'Male';
+  String sex = 'Male'.tr;
 
 
   GlobalKey<FormState> _registerFormkey = GlobalKey<FormState>();
@@ -62,10 +64,10 @@ class _RegisterState extends State<Register> {
     'email': emailTec.text,
     'pwd': passwordTec.text,
     'joinDate': todayToString(),
-    'verified': verifyAnyCreatedAccount? true:  false,
+    'verified': verifyAnyCreatedAccount || gglMap['gglEmail']!=''? true:  false,
 
     'isAdmin': false,
-    'accepted': false,
+    'accepted':isPatient?true: false,
     'espCode': isPatient ?espCodeTec.text:'',
     'speciality': specialityTec.text,
     'age': ageTec.text,
@@ -102,17 +104,17 @@ class _RegisterState extends State<Register> {
                 authCtr.checkUserVerif(isGoogle: true);
               });
             });
-          showSuccess(sucText: 'your account has been created successfully'.tr);
+          showSuccess(sucText: 'your account has been created successfully'.tr,btnOkPress: (){});
         }).catchError((error) => print("Failed to create new user<google> doc: $error"));
       }else{
         authCtr.signUp(emailTec.text, passwordTec.text, onSignUp: () {
           /// add user to cloud
-          addDocument(fieldsMap: addUserMap, collName: usersCollName).then((value) {
+          addDocument(fieldsMap: addUserMap, collName: usersCollName,addRealTime: true,realtimeMap: {'bpm_once':71},docPathRealtime: 'patients').then((value) {
             Get.back();//hide loading
             verifyAnyCreatedAccount? Get.offAll(() => VerifyScreen()):Get.offAll(() => Login()) ;
 
 
-            showSuccess(sucText: 'your account has been created successfully'.tr);
+            showSuccess(sucText: 'your account has been created successfully'.tr,btnOkPress: (){Get.offAll(Login());});
           }).catchError((error) => print("Failed to create new user doc: $error"));
         });
 
@@ -128,7 +130,7 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedGender = ['Male', 'Female'];
+    final selectedGender = ['Male'.tr, 'Female'.tr];
     String? _selectedGender = 'Male';
     return Scaffold(
       body: backGroundTemplate(
@@ -174,7 +176,7 @@ class _RegisterState extends State<Register> {
                     icon: Icons.person,
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "name can\'t be empty".tr;
+                        return "name can't be empty".tr;
                       }
                      else {
                         return null;
@@ -190,9 +192,9 @@ class _RegisterState extends State<Register> {
                     validator: (value) {
                       RegExp regex = RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]");
                       if (value!.isEmpty) {
-                        return "email can\'t be empty".tr;
+                        return "email can't be empty".tr;
                       }
-                      if (!regex.hasMatch(value)) {
+                      if (!EmailValidator.validate(value!)) {
                         return ("Enter a valid email".tr);
                       } else {
                         return null;
@@ -215,7 +217,7 @@ class _RegisterState extends State<Register> {
                     validator: (value) {
                       RegExp regex = RegExp(r'^.{6,}$');
                       if (value!.isEmpty) {
-                        return 'password can\'t be empty'.tr;
+                        return "password can't be empty".tr;
                       }
                       if (!regex.hasMatch(value)) {
                         return ('Enter a valid password of at least 6 characters'.tr);
@@ -234,7 +236,7 @@ class _RegisterState extends State<Register> {
 
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "speciality can\'t be empty".tr;
+                        return "age can't be empty".tr;
                       }
                    else {
                         return null;
@@ -248,7 +250,7 @@ class _RegisterState extends State<Register> {
 
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "speciality can\'t be empty".tr;
+                        return "speciality can't be empty".tr;
                       }
                       else {
                         return null;
@@ -263,7 +265,7 @@ class _RegisterState extends State<Register> {
                     icon: Icons.home,
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "address can\'t be empty".tr;
+                        return "address can't be empty".tr;
                       }
                      else {
                         return null;
@@ -277,13 +279,13 @@ class _RegisterState extends State<Register> {
                     controller: phoneTec,
                     labelText: 'Phone'.tr,
                     hintText: 'Enter your number'.tr,
-                    icon: Icons.email,
+                    icon: Icons.phone,
                     isPwd: false,
                     obscure: false,
                     onSuffClick: (){},
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "number can\'t be empty".tr;
+                        return "number can't be empty".tr;
                       }
                      else {
                         return null;
@@ -291,7 +293,27 @@ class _RegisterState extends State<Register> {
                     },
                   ),
                   SizedBox(height: spaceFields),
-                  customTextField(
+                  if(!isPatient) customTextField(
+                    textInputType: TextInputType.number,
+
+                    controller: taxTec,
+                    labelText: 'Tax number'.tr,
+                    hintText: 'Enter your tax number'.tr,
+                    icon: Icons.phone,
+                    isPwd: false,
+                    obscure: false,
+                    onSuffClick: (){},
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return "number can't be empty".tr;
+                      }
+                     else {
+                        return null;
+                      }
+                    },
+                  ),
+                  SizedBox(height: spaceFields),
+                 if(isPatient) customTextField(
                     textInputType: TextInputType.text,
 
                     controller: espCodeTec,
@@ -303,7 +325,7 @@ class _RegisterState extends State<Register> {
                     onSuffClick: (){},
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "code can\'t be empty".tr;
+                        return "code can't be empty".tr;
                       }
                      else {
                         return null;
@@ -377,8 +399,8 @@ class _RegisterState extends State<Register> {
                         ),
                       ),
                       onPressed: () => signUp(),
-                      child: const Text(
-                        "Create account",
+                      child:  Text(
+                        "Create account".tr,
                         style: TextStyle(
                             fontSize: 16,
                             color: Colors.white,

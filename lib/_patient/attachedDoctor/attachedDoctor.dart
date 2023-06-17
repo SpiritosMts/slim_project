@@ -153,7 +153,7 @@ class _AttachedDoctorState extends State<AttachedDoctor> {
                                 ),
                                 SizedBox(width: txtIconPad),
                                 Text(
-                                    _isConnected ? 'Available' : 'Not Available',
+                                    _isConnected ? 'Available'.tr : 'Not Available'.tr,
                                   style: TextStyle(
                                       color :_isConnected ? Colors.greenAccent.withOpacity(0.7) : Colors.red.withOpacity(0.7),
                                       fontSize: txtSize),
@@ -174,7 +174,7 @@ class _AttachedDoctorState extends State<AttachedDoctor> {
                         btnOnPress: () async {
                           if(_isConnected) Get.to(()=>ChatRoom(),arguments: {'user': ptCtr.myDoctor});
                         },
-                        textBtn: 'Chat',
+                        textBtn: 'Chat'.tr,
                         btnWidth: 120,
                         icon: Icon(
                           Icons.chat,
@@ -193,7 +193,7 @@ class _AttachedDoctorState extends State<AttachedDoctor> {
                       alignment: Alignment.bottomLeft,
                       child: customButton(
                         btnOnPress: () async {
-                          showNoHeader(txt: 'Are you sure you want to remove this doctor ?',btnOkText: 'Remove',icon: Icons.close).then((accept) {
+                          showNoHeader(txt: 'Are you sure you want to remove this doctor ?'.tr,btnOkText: 'Remove',icon: Icons.close).then((accept) {
                             if (accept) {
                               removePatient(authCtr.cUser);
                               //dcCtr.updateCtr();
@@ -203,7 +203,7 @@ class _AttachedDoctorState extends State<AttachedDoctor> {
                             }
                           });
                           },
-                        textBtn: 'Remove',
+                        textBtn: 'Remove'.tr,
                         btnWidth: 120,
                         icon: Icon(
                           Icons.close,
@@ -218,7 +218,7 @@ class _AttachedDoctorState extends State<AttachedDoctor> {
                   ),
                 ],
               ):Center(
-                child: Text('no attached doctor yet', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
+                child: Text('no attached doctor yet'.tr, textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
                   textStyle:  TextStyle(
                       fontSize: 23  ,
                       color: Colors.white,

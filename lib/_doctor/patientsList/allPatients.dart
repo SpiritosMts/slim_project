@@ -84,7 +84,7 @@ class _AllPatientsViewState extends State<AllPatientsView> {
                     )),
               ),
             )
-                : Text('Patients List');
+                : Text('Patients List'.tr);
           }),
       actions: <Widget>[
         GetBuilder<DoctorHomeCtr>(
@@ -132,7 +132,7 @@ class _AllPatientsViewState extends State<AllPatientsView> {
               : gc.shouldLoad? Center(
             child: CircularProgressIndicator(),
           ):Center(
-            child: Text('no patients found', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
+            child: Text('no patients found'.tr, textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
               textStyle:  TextStyle(
                   fontSize: 27  ,
                   color: Colors.white,

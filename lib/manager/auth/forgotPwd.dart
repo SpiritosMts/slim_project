@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:get/get.dart';
@@ -107,9 +108,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             validator: (value) {
                               RegExp regex = RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]");
                               if (value!.isEmpty) {
-                                return "email can\'t be empty".tr;
+                                return "email can't be empty".tr;
                               }
-                              if (!regex.hasMatch(value)) {
+                              if (!EmailValidator.validate(value!)) {
                                 return ("Enter a valid email".tr);
                               } else {
                                 return null;
@@ -128,7 +129,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                 authCtr.ResetPss(forgotEmailCtr.text);
                               }
                               },
-                            textBtn: 'Send',
+                            textBtn: 'Send'.tr,
                             btnWidth: 110,
                             icon: Icon(
                               Icons.login,

@@ -1,6 +1,7 @@
 
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -405,7 +406,7 @@ acceptUser(String userID) {
   usersColl.doc(userID).get().then((DocumentSnapshot documentSnapshot) async {
     if (documentSnapshot.exists) {
       await usersColl.doc(userID).update({
-        'verified': true, // turn verified to true in  db
+        'accepted': true, // turn verified to true in  db
       }).then((value) async {
         //addFirstServer(userID);
         print('## user request accepted');
@@ -417,4 +418,84 @@ acceptUser(String userID) {
       });
     }
   });
+}
+
+changeUserName(newName) async {
+  await usersColl.doc(authCtr.cUser.id).get().then((DocumentSnapshot documentSnapshot) async {
+    if (documentSnapshot.exists) {
+      await usersColl.doc(authCtr.cUser.id).update({
+        'name': newName, // turn verified to true in  db
+      }).then((value) async {
+        showSnack('name updated'.tr);
+        //refreshUser(currentUser.email);
+        //Get.back();//cz it in dialog
+      }).catchError((error) async {
+        //print('## user request accepted accepting error =${error}');
+        //toastShow('user request accepted accepting error');
+      });
+    }
+  });
+}
+changeUserEmail(newEmail) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    try {
+      // Change email
+      await user.updateEmail(newEmail).then((value){
+        usersColl.doc(authCtr.cUser.id).get().then((DocumentSnapshot documentSnapshot) async {
+          if (documentSnapshot.exists) {
+            await usersColl.doc(authCtr.cUser.id).update({
+              'email': newEmail, // turn verified to true in  db
+            }).then((value) async {
+              print('## email firestore updated');
+              showSnack('email updated');
+              //refreshUser(_emailController.text);
+            }).catchError((error) async {
+            });
+          }
+        });
+      });
+
+
+
+    } catch (e) {
+
+      showSnack('This operation is sensitive and requires recent authentication.\n Log in again before retrying this request',color: Colors.black54);
+      print('## Failed 4to update email:===> $e');
+    }
+  }
+}
+
+changeUserPassword(newPassword) async {
+  User? user = FirebaseAuth.instance.currentUser;
+
+  if (user != null) {
+    try {
+
+
+      // Change password
+       await user.updatePassword(newPassword).then((value){
+        usersColl.doc(authCtr.cUser.id).get().then((DocumentSnapshot documentSnapshot) async {
+          if (documentSnapshot.exists) {
+            await usersColl.doc(authCtr.cUser.id).update({
+              'pwd': newPassword, // turn verified to true in  db
+            }).then((value) async {
+              showSnack('password updated');
+              //refreshUser(currentUser.email);
+
+            }).catchError((error) async {
+            });
+          }
+        });
+      });
+
+
+
+    } catch (e) {
+
+      showSnack('This operation is sensitive and requires recent authentication.\n Log in again before retrying this request',color: Colors.black54);
+
+      print('## Failed to update password:===> $e');
+    }
+  }
 }

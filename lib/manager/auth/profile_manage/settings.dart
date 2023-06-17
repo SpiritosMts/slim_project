@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,6 +8,7 @@ import 'package:smart_care/manager/myUi.dart';
 import 'package:smart_care/manager/myVoids.dart';
 import 'package:smart_care/manager/styles.dart';
 
+import '../../firebaseVoids.dart';
 import '../../myLocale/myLocaleCtr.dart';
 
 // class Settings extends StatefulWidget {
@@ -122,6 +124,12 @@ class _SettingsState extends State<Settings> {
   bool darkMode = false;
   bool background = false;
   bool notification = false;
+  final emailFormKey = GlobalKey<FormState>();
+  final nameFormKey = GlobalKey<FormState>();
+  final pwdFormKey = GlobalKey<FormState>();
+  final TextEditingController newEmailCtr =  TextEditingController();
+  final TextEditingController newNameCtr =  TextEditingController();
+  final TextEditingController newPwdCtr =  TextEditingController();
 
   //Color _activeSwitchColor = yellowColHex;
   Color _arrowColor = primaryColor;
@@ -218,7 +226,7 @@ class _SettingsState extends State<Settings> {
         content: Builder(
           builder: (context) {
             return SizedBox(
-              height: 100.h / 2.5,
+              height: 100.h / 2,
               width: 100.w  ,
               child: languageList(),
             );
@@ -295,7 +303,7 @@ class _SettingsState extends State<Settings> {
                 },
                 initialValue: useCustomTheme,
                 leading: Icon(Icons.format_paint,color: settingIconColor,),
-                title: Text('Enable custom theme'),
+                title: Text('Enable custom theme'.tr),
               ),
             ],
           ),
@@ -311,15 +319,113 @@ class _SettingsState extends State<Settings> {
                 title: Text('Email'.tr),
                 enabled: true,
                 onPressed: (val){
+                  showChangeProp(
+                      icon: Icon(Icons.email,size: 45,),
+                      //title:'Change Name'.tr,
+                      body: Column(
+                        children: [
+                          Text('Change Email'.tr,style: TextStyle(
+                              fontSize: 22
+                          ),),
+                          SizedBox(height: 20,),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                            child: Form(
+                              key: emailFormKey,
+                              child: customTextField
+                                (
+                                color: accentColor0,
+                                controller: newEmailCtr,
+                                labelText: 'Email'.tr,
+                                hintText: 'Enter your email'.tr,
+                                icon: Icons.email,
+                                isPwd: false,
+                                obscure: false,
+                                onSuffClick: (){},
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return "email can't be empty".tr;
+                                  }
+                                  if (!EmailValidator.validate(value!)) {
+                                    return ("Enter a valid email".tr);
+                                  } else {
+                                    return null;
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20,),
 
+                        ],
+                      ),
+                      btnOkPress: (){
+                        if (emailFormKey.currentState!.validate()) {
+                          changeUserEmail(newEmailCtr.text);
+                          newEmailCtr.clear();
+                          Get.back();
+                        }
+                      }
+                  );
+                },
+              ),
+              SettingsTile.navigation(
+                leading: Icon(Icons.person,color: settingIconColor,),
+                title: Text('Name'.tr),
+                enabled: true,
+                onPressed: (val){
+                  showChangeProp(
+                    icon: Icon(Icons.person,size: 45,),
+                    //title:'Change Name'.tr,
+                    body: Column(
+                      children: [
+                        Text('Change Name'.tr,style: TextStyle(
+                          fontSize: 22
+                        ),),
+                        SizedBox(height: 20,),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          child: Form(
+                            key: nameFormKey,
+                            child: customTextField
+                              (
+                              color: accentColor0,
+                            controller: newNameCtr,
+                            labelText: 'Name'.tr,
+                            hintText: 'Enter your name'.tr,
+                            icon: Icons.person,
+                            isPwd: false,
+                            obscure: false,
+                            onSuffClick: (){},
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "name can't be empty".tr;
+                              }
+                              else {
+                                return null;
+                              }
+                            },
+                  ),
+                          ),
+                        ),
+                        SizedBox(height: 20,),
+
+                      ],
+                    ),
+                    btnOkPress: (){
+                      if (nameFormKey.currentState!.validate()) {
+                        changeUserName(newNameCtr.text);
+                        newNameCtr.clear();
+                        Get.back();
+                      }
+                    }
+                  );
                 },
               ),
               SettingsTile.navigation(
                 leading: Icon(Icons.logout,color: settingIconColor,),
                 title: Text('Sign out'.tr),
                 onPressed: (val){
-
-
                   authCtr.signOut();
                 },
               ),
@@ -348,8 +454,58 @@ class _SettingsState extends State<Settings> {
                 leading: Icon(Icons.lock,color: settingIconColor,),
                 title: Text('Change password'.tr),
                 onPressed: (val){
+                  showChangeProp(
+                      icon: Icon(Icons.lock,size: 45,),
+                      //title:'Change Name'.tr,
+                      body: Column(
+                        children: [
+                          Text('Change Password'.tr,style: TextStyle(
+                              fontSize: 22
+                          ),),
+                          SizedBox(height: 20,),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                            child: Form(
+                              key: pwdFormKey,
+                              child: customTextField
+                                (
+                                color: accentColor0,
+                                controller: newPwdCtr,
+                                labelText: 'Password'.tr,
+                                hintText: 'Enter your password'.tr,
+                                icon: Icons.lock,
+                                isPwd: false,
+                                obscure: false,
+                                onSuffClick: (){},
+                                validator: (value) {
+                                  RegExp regex = RegExp(r'^.{6,}$');
 
+                                  if (value!.isEmpty) {
+                                    return "password can't be empty".tr;
+                                  }
+                                  if (!regex.hasMatch(value)) {
+                                    return ('Enter a valid password of at least 6 characters'.tr);
+                                  } else {
+                                    return null;
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20,),
+
+                        ],
+                      ),
+                      btnOkPress: (){
+                        if (pwdFormKey.currentState!.validate()) {
+                          changeUserEmail(newPwdCtr.text);
+                          newPwdCtr.clear();
+                          Get.back();
+                        }
+                      }
+                  );
                 },
+
               ),
               SettingsTile.switchTile(
                 onToggle: (_) {},

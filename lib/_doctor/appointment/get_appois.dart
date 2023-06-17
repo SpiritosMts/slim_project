@@ -40,12 +40,12 @@ class _GetAppointmentsState extends State<GetAppointments> {
                     itemCount: appointments.length,
                     itemBuilder: (BuildContext context, int index) {
                       String key = appointments.keys.elementAt(index);
-                      print('## key: ${key}');
+                      //print('## key: ${key}');
                       //bool newAppoi = appointments[key]['new'];
                       return appoiCard(key,appointments[key]!);
                     }
                 ):Center(
-                  child: Text('no appointments found', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
+                  child: Text('no appointments found'.tr, textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
                     textStyle:  TextStyle(
                         fontSize: 23  ,
                         color: Colors.white,

@@ -122,7 +122,7 @@ class _LoginState extends State<Login> {
                             validator: (value) {
                               RegExp regex = RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]");
                               if (value!.isEmpty) {
-                                return "email can\'t be empty".tr;
+                                return "email can't be empty".tr;
                               }
                               if (!regex.hasMatch(value)) {
                                 return ("Enter a valid email".tr);
@@ -151,7 +151,7 @@ class _LoginState extends State<Login> {
                                 validator: (value) {
                                   RegExp regex = RegExp(r'^.{6,}$');
                                   if (value!.isEmpty) {
-                                    return 'password can\'t be empty'.tr;
+                                    return "password can't be empty"  .tr;
                                   }
                                   if (!regex.hasMatch(value)) {
                                     return ('Enter a valid password of at least 6 characters'.tr);
@@ -162,6 +162,7 @@ class _LoginState extends State<Login> {
                               ),
                               GestureDetector(
                                 onTap: (){
+                                  //authCtr.signOut();
                                   Get.to(()=>ForgotPassword());
                                 },
                                 child: Padding(
@@ -189,7 +190,7 @@ class _LoginState extends State<Login> {
                                 btnOnPress: () async {
                                   await authCtr.signInWithGoogle();
                                   },
-                                textBtn: 'Google',
+                                textBtn: 'Google'.tr,
                                 btnWidth: 110,
                                 icon: Icon(
                                   Ionicons.logo_google,
@@ -204,7 +205,7 @@ class _LoginState extends State<Login> {
                                 btnOnPress: () async {
                                   login();
                                 },
-                                textBtn: 'Login',
+                                textBtn: 'Login'.tr,
                                 btnWidth: 110,
                                 icon: Icon(
                                   Icons.login,
@@ -224,7 +225,7 @@ class _LoginState extends State<Login> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('you have no account?'.tr,style: TextStyle(
+                              Text('you have no account ?'.tr,style: TextStyle(
                                 color: Colors.white70,
                                 fontWeight: FontWeight.w500,
                               ),),

@@ -27,7 +27,7 @@ class _MyPatientsState extends State<MyPatients> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("My Patients"),
+        title: Text("My Patients".tr),
         automaticallyImplyLeading:false,
         centerTitle: true,
         backgroundColor: appbarColor,
@@ -75,7 +75,7 @@ class _MyPatientsState extends State<MyPatients> {
           )
               :Center(
 
-              child:Text('you have no patients yet', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
+              child:Text('you have no patients yet'.tr, textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
                 textStyle:  TextStyle(
                     fontSize: 23  ,
                     color: Colors.white,

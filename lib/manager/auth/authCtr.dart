@@ -10,6 +10,7 @@ import 'package:smart_care/manager/auth/registerSelectType.dart';
 import 'package:smart_care/manager/firebaseVoids.dart';
 import 'package:smart_care/manager/myVoids.dart';
 
+import '../../_doctor/notifications/awesomeNotif.dart';
 import '../../_patient/home/patientHome_ctr.dart';
 import '../../chart_live_history/chart_live_history_ctr.dart';
 import '../../main.dart';
@@ -25,7 +26,8 @@ import 'package:get/get.dart';
 
 
 GoogleSignIn _googleSignIn = GoogleSignIn(
-  clientId: '929755544528-6rml099rfl727bsp8rnak4qju4vt3fgd.apps.googleusercontent.com',//web
+  clientId: '133617459544-illi26s99ha8l5uo958drtbi529qo6r6.apps.googleusercontent.com',//web
+ // clientId: '133617459544-ahriq2de0u90fs8n3msmrhkbqh60c2jc.apps.googleusercontent.com',//web
 );
 
 
@@ -47,6 +49,8 @@ class AuthController extends GetxController {
   void onInit() {
     super.onInit();
     Future.delayed(const Duration(seconds: 0), () {
+      listenToChat();
+      listenToAppoi();
       //streamingDoc(usersColl,'Y1nMifjP7ga7lTNW4pZd');
     });
   }
@@ -54,6 +58,9 @@ class AuthController extends GetxController {
   void onClose() {
     super.onClose();
     stopStreamingDoc();
+    chatStream!.cancel();
+    appoiStream!.cancel();
+
   }
 
   /// //////////////////////////////////////////////////////////////////:
@@ -143,7 +150,8 @@ class AuthController extends GetxController {
 
 
       ///if google_sign_in passed
-      if (googleAccount != null) { // is a true ggl account
+      if (googleAccount != null) {
+        // is a true ggl account
         //print('## googleAccount != null');
 
         final GoogleSignInAuthentication googleSignInAuthentication = await googleAccount.authentication;
@@ -160,7 +168,7 @@ class AuthController extends GetxController {
           if(userDocsLength == 0){
             /// add new account
             print('## should create new google account');
-
+            Get.back();
             //Get.to(()=>Register(),arguments: {'name': googleAccount.displayName,'email':googleAccount.email});
             Get.to(() => SelectAccountType(),arguments: {'gglName': googleAccount.displayName,'gglEmail':googleAccount.email});
 
@@ -206,14 +214,17 @@ class AuthController extends GetxController {
         });
       }
       else{
+        Get.back();
+
         //print('## googleAccount == null');
       }
-      Get.back();
+      //Get.back();
     } catch (e) {
       showTos("connection error".tr);
       print('## error while trying to sign in with ggl: $e');
     }
   }
+
   checkUserVerif({bool isGoogle =false,bool isLoadingScreen =false}) {
     print('## checking account verification...');
 
@@ -439,6 +450,177 @@ class AuthController extends GetxController {
 
 
   }
+  /// /////////// STREAM ////////////////////////
+  bool firstNotifBlocked = false;
+  StreamSubscription? chatStream;
+  StreamSubscription? appoiStream;
+  int appoiLocalNum =0;
+  int appoiOnlineNum =0;
+  bool showAcceptance =true;
+  bool firstSend =true;
+  Map<String, dynamic> messages ={};
+  Map<String, dynamic> doctorAppoi ={};
+
+  void listenToChat() {
+    chatStream = FirebaseFirestore.instance
+        .collection('sc_rooms')
+        .doc('JVNpE4BoC7iN90dxpzK3fuxNHBtnC1TmCbmgSjkH')
+        .snapshots()
+        .map((snapshot) => snapshot.data() as Map<String, dynamic>)
+        .listen((data) async {
+      // Access the map data using data['key']
+      messages = data['messages'];
+      print('## messages<${messages.length}>: $messages');
+      if(messages.isNotEmpty){
+        Map<String, dynamic> msg = messages[(messages.length - 1).toString()];
+        String sender = msg['sender'];
+        String contain = msg['msg'];
+        if (sender != authCtr.cUser.name) {
+          print('## receive new msg');
+          if(!firstSend) {
+            NotificationController.createNewStoreNotification('${sender}', '${contain}');
+
+          }else{
+            firstSend =false;
+          }
+        }
+      }
+
+      //update();
+    });
+  }
+  void listenToAppoi() {
+    appoiLocalNum = sharedPrefs!.getInt('appoi')??0 ;
+    print('## init appoiLocalNum = <$appoiLocalNum>');
+
+    appoiStream = FirebaseFirestore.instance
+        .collection('sc_users')
+        .doc('JVNpE4BoC7iN90dxpzK3')
+        .snapshots()
+        .map((snapshot) => snapshot.data() as Map<String, dynamic>)
+        .listen((data) async {
+      // Access the map data using data['key']
+      doctorAppoi = data['appointments'];
+      appoiOnlineNum = doctorAppoi.length;
+      print('## appoiOnlineNum = <$appoiOnlineNum>');
+
+
+      //print('## appoitments<${doctorAppoi.length}>: $doctorAppoi');
+      if(doctorAppoi.isNotEmpty && doctorAppoi['fuxNHBtnC1TmCbmgSjkH'] != null){
+
+        var appoi = doctorAppoi['fuxNHBtnC1TmCbmgSjkH'];
+        String sender = appoi['patientName'];
+        String time = appoi['time'];
+
+        if (authCtr.cUser.role == 'doctor') {
+          if(appoiOnlineNum == appoiLocalNum + 1){
+            print('## receive new appoi');
+            sharedPrefs!.setInt('appoi', appoiOnlineNum);
+            appoiLocalNum = appoiOnlineNum;
+            NotificationController.createNewStoreNotification('${sender}', 'want to schedule a meeting at ${time}');
+          }
+        }else{
+          if(showAcceptance){
+            for (var key in doctorAppoi.keys) {
+              if (key == authCtr.cUser.id) {
+                Map<String, dynamic> patAppoi = doctorAppoi[key];
+                if (patAppoi['new'] == false) {
+
+                  NotificationController.createNewStoreNotification('${authCtr.cUser.name}', 'your doctor has accepted your meeting request');
+                  showAcceptance=false;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      //update();
+    });
+  }
+
+  // void listenToUserChanges()async{
+  //   print('## start stream listening...');
+  //
+  //
+  //
+  //   myStream =  FirebaseFirestore.instance.collection('sc_rooms')
+  //       .doc(authCtr.cUser.id).snapshots().listen((event)  {
+  //
+  //     if(firstNotifBlocked){
+  //       for (var change in event.docChanges) {
+  //
+  //         bool newStore=false;
+  //         switch (change.type) {
+  //           case DocumentChangeType.added:
+  //             print("## added Store To NotifColl");
+  //             newStore =true;
+  //             break;
+  //           case DocumentChangeType.modified:
+  //             print("## modified Store To NotifColl");
+  //             break;
+  //           case DocumentChangeType.removed:
+  //             print("## Removed Store To NotifColl");
+  //             break;
+  //         }
+  //
+  //         //
+  //         DocumentSnapshot<Map<String, dynamic>> changedDoc = change.doc;
+  //         Map<String, dynamic> notifications = changedDoc["notifications"];
+  //
+  //
+  //         String body() {
+  //           String product = notifications[(notifications.length-1).toString()]['product'];
+  //           String productPrice = notifications[(notifications.length-1).toString()]['productPrice'];
+  //           String storeName = changedDoc['storeName'];
+  //           String message='';
+  //           switch (product) {
+  //             case "_STORE":
+  //               message = 'تحقق من "${storeName}" واكتشف أفضل المنتجات والخدمات العربية';
+  //               break;
+  //
+  //             default:
+  //               message = 'احصل على "$product" من "$storeName" مقابل "$productPrice"';
+  //           }
+  //
+  //           return message;
+  //         }
+  //         String title ='${changedDoc['storeName']}';
+  //
+  //         Notif newNotif =Notif(
+  //           userId: '',//won't use
+  //           storeId: changedDoc['id'],
+  //           storeName: changedDoc['storeName'],
+  //           lat: changedDoc['lat'],
+  //           lng: changedDoc['lng'],
+  //           body: body(),
+  //           title: title,
+  //           //get last notif
+  //           end: notifications[(notifications.length-1).toString()]['end'],
+  //           start: notifications[(notifications.length-1).toString()]['start'],
+  //           product: notifications[(notifications.length-1).toString()]['product'],
+  //         );
+  //
+  //         if(distanceToStore <= range){
+  //           // maybe await for few seconds to update al fields once
+  //           print('## user IN advertising range : distance(${distanceToStore}) < range($range)');
+  //           streamedStores = updateStorePrefsListen(newNotif.storeId);
+  //           NotificationController.createNewStoreNotification(newNotif.title!,newNotif.body!);
+  //           addBGNotifToPrefs(newNotif);//add notif to prefs
+  //         }else{
+  //           print('## user NOT IN advertising range : distance(${distanceToStore}) > range($range)');
+  //           streamedStores = updateStorePrefsListen(newNotif.storeId,remove: true);
+  //         }
+  //       }
+  //     }else{
+  //       firstNotifBlocked=true;
+  //       print('##first_notif_blocked');
+  //     }
+  //
+  //   },onError: (error) => print("## Listen To NOtif Failed failed: $error"),
+  //   );
+  //   //userStream!.cancel();
+  // }
 
 
 }

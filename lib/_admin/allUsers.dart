@@ -95,6 +95,7 @@ class _AllUsersState extends State<AllUsers> with TickerProviderStateMixin {
 
               SafeArea(
                 child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
                   child: Column(
                     children: [
                       SizedBox(height: 20),
@@ -118,7 +119,10 @@ class _AllUsersState extends State<AllUsers> with TickerProviderStateMixin {
                               List users = snapshot.data!.docs;
                               return  (users.isNotEmpty)
                                   ? ListView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+
                                 //itemExtent: 180,
+
                                   padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                                   shrinkWrap: true,
                                   itemCount: users.length,
@@ -132,7 +136,7 @@ class _AllUsersState extends State<AllUsers> with TickerProviderStateMixin {
                               ):Center(
                                 child: Padding(
                                   padding: const EdgeInsets.only(top: 40.0),
-                                  child: Text('no patients verified yet', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
+                                  child: Text('no patients verified yet'.tr, textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
                                     textStyle:  TextStyle(
                                         fontSize: 23  ,
                                         color: Colors.white,
@@ -181,7 +185,9 @@ class _AllUsersState extends State<AllUsers> with TickerProviderStateMixin {
                             List users = snapshot.data!.docs;
                             return  (users.isNotEmpty)
                                 ? ListView.builder(
-                              //itemExtent: 180,
+                                physics: const NeverScrollableScrollPhysics(),
+
+                                //itemExtent: 180,
                                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                                 shrinkWrap: true,
                                 itemCount: users.length,
@@ -195,7 +201,7 @@ class _AllUsersState extends State<AllUsers> with TickerProviderStateMixin {
                             ):Center(
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 40.0),
-                                child: Text('no doctors verified yet', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
+                                child: Text('no doctors verified yet'.tr, textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
                                   textStyle:  TextStyle(
                                       fontSize: 23  ,
                                       color: Colors.white,
@@ -239,7 +245,9 @@ class _AllUsersState extends State<AllUsers> with TickerProviderStateMixin {
                             List users = snapshot.data!.docs;
                             return  (users.isNotEmpty)
                                 ? ListView.builder(
-                              //itemExtent: 180,
+                                physics: const NeverScrollableScrollPhysics(),
+
+                                //itemExtent: 180,
                                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                                 shrinkWrap: true,
                                 itemCount: users.length,
@@ -253,7 +261,7 @@ class _AllUsersState extends State<AllUsers> with TickerProviderStateMixin {
                             ):Center(
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 40.0),
-                                child: Text('no doctors requests yet', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
+                                child: Text('no doctors requests yet'.tr, textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
                                   textStyle:  TextStyle(
                                       fontSize: 23  ,
                                       color: Colors.white,

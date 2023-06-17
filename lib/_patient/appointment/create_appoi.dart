@@ -57,7 +57,7 @@ class _CreateAppoiState extends State<CreateAppoi> {
                       onSuffClick: (){},
                       validator: (value) {
                         if (value!.isEmpty) {
-                          return "topic can\'t be empty".tr;
+                          return "topic can't be empty".tr;
                         } else {
                           return null;
                         }
@@ -104,7 +104,7 @@ class _CreateAppoiState extends State<CreateAppoi> {
               reversed: true,
               icon: Icon(Icons.send_rounded,  color: Colors.white,),
               btnWidth: 130,
-              textBtn: 'Send',
+              textBtn: 'Send'.tr,
               btnOnPress: (){
                ptCtr.sendAppoitment();
 
@@ -115,7 +115,7 @@ class _CreateAppoiState extends State<CreateAppoi> {
         ):Padding(
           padding: const EdgeInsets.only(top: 20.0),
           child: Center(
-            child: Text('no attached doctor \nto send Appointment', textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
+            child: Text('no attached doctor \nto send Appointment'.tr, textAlign: TextAlign.center, style: GoogleFonts.indieFlower(
               textStyle:  TextStyle(
                   fontSize: 23  ,
                   color: Colors.white,

@@ -41,7 +41,7 @@ Future<void> initFirebase() async {  /// FIREBASE_INIT
 
 /// INTRO /////////
 int introTimes = 0;
-bool showIntro = false;
+bool showIntro = true;
 introTimesGet()async{
   introTimes = sharedPrefs!.getInt('intro')??0 ;
   print('## introTimes_get_<$introTimes>');

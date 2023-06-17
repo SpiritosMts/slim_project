@@ -31,7 +31,7 @@ class _AdvicesState extends State<Advices> {
           child: GetBuilder<PatientHomeCtr>(
             builder: (_)=>(ptCtr.advices.isNotEmpty)
                 ? ListView.builder(
-                itemExtent: 130,
+                //itemExtent: 130,
                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                 shrinkWrap: true,
                 itemCount: ptCtr.advices.length,

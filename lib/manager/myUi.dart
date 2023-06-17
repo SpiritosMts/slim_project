@@ -14,6 +14,7 @@ import 'package:smart_care/models/user.dart';
 import '../_doctor/notifications/map.dart';
 import '../_patient/advices/oneAdvice.dart';
 import 'firebaseVoids.dart';
+import 'myLocale/myLocaleCtr.dart';
 import 'styles.dart';
 
 
@@ -99,7 +100,8 @@ Widget notifCard(String ind, Map<String, dynamic> notifInfo,) {
          // if(authCtr.cUser.role == 'doctor')
            Positioned(
             bottom: 40,
-            right: 25,
+            right: (currLang =='ar')? null:25,//english
+            left: (currLang =='ar')? 25:null,//arabic
             child: CircleAvatar(
               backgroundColor: Colors.blueGrey,
               radius: 20,
@@ -119,7 +121,8 @@ Widget notifCard(String ind, Map<String, dynamic> notifInfo,) {
           ),
            Positioned(
             bottom: 13,
-            right: 13,
+             right: (currLang =='ar')? null:13,//english
+             left: (currLang =='ar')? 13:null,//arabic
             child:   GestureDetector(
 
               child: Icon(
@@ -151,16 +154,18 @@ Widget adviceCard(advice, {bool newAdvice = false}) { //doctor
 
   Color itemCol = newAdvice ? Colors.green : Colors.white38;
 
+  String title=advice['title'];
+  String desc=advice['description'];
   return GestureDetector(
     onTap: () async {
 
-      Get.to(()=>OneAdvice(body: advice['description'],title: advice['title'],));
+      Get.to(()=>OneAdvice(body: desc.tr,title: title.tr,));
     },
     child: Padding(
       padding: const EdgeInsets.all(5.0),
       child: Container(
         width: 100.w,
-        height: 130,
+        height: 140,
         child: Stack(
           children: [
             Card(
@@ -200,7 +205,7 @@ Widget adviceCard(advice, {bool newAdvice = false}) { //doctor
 
                                   children: [
                                     Text(
-                                      advice['title'],
+                                      title.tr,
                                       textAlign: TextAlign.start,
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
@@ -209,7 +214,7 @@ Widget adviceCard(advice, {bool newAdvice = false}) { //doctor
                                     SizedBox(height: 5),
 
                                     Text(
-                                      '${advice['description']}}',
+                                      '${desc.tr}}',
                                       maxLines: 3,
                                       textAlign: TextAlign.start,
                                       overflow: TextOverflow.ellipsis,
@@ -258,12 +263,13 @@ Widget appNameText(){
 }
 
 
-Widget customTextField({TextInputType? textInputType ,String? hintText,String? labelText,TextEditingController? controller ,String? Function(String?)? validator,bool obscure = false,bool isPwd = false,Function()? onSuffClick,IconData? icon}){
+Widget customTextField({Color?  color,TextInputType? textInputType ,String? hintText,String? labelText,TextEditingController? controller ,String? Function(String?)? validator,bool obscure = false,bool isPwd = false,Function()? onSuffClick,IconData? icon}){
   return Padding(
     padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
     child: Container(
 
       child: TextFormField(
+
 
         controller: controller,
         keyboardType: textInputType ,
@@ -276,6 +282,9 @@ Widget customTextField({TextInputType? textInputType ,String? hintText,String? l
 
 
 
+          focusColor: color ?? Colors.white,
+          fillColor: color ?? Colors.white,
+          hoverColor: color ?? Colors.white,
             contentPadding: const EdgeInsets.only(bottom: 0,right: 20,top: 0),
             suffixIconConstraints:BoxConstraints(minWidth: 50) ,
             prefixIconConstraints: BoxConstraints(minWidth: 50),
@@ -398,7 +407,8 @@ Widget patientCard(ScUser user, List<dynamic> doctrPats) {
             (!doctrPats.contains(user.id))?
               Positioned(
                 bottom: 40,
-                right: 25,
+                right: (currLang =='ar')? null:25,//english
+                left: (currLang =='ar')? 25:null,//arabic
                 child: CircleAvatar(
                   backgroundColor: Colors.blueGrey,
                   radius: 20,
@@ -414,8 +424,9 @@ Widget patientCard(ScUser user, List<dynamic> doctrPats) {
                 ),
               ):Positioned(
                 bottom: 40,
-                right: 25,
-                child: CircleAvatar(
+              right: (currLang =='ar')? null:25,//english
+              left: (currLang =='ar')? 25:null,//arabic
+                              child: CircleAvatar(
                   backgroundColor: Colors.blueGrey,
                   radius: 20,
                   child: IconButton(
@@ -432,11 +443,12 @@ Widget patientCard(ScUser user, List<dynamic> doctrPats) {
 
             if(doctrPats.contains(user.id)) Positioned(
                 bottom: 10,
-                right: 20,
+                right: (currLang =='ar')? null:20,//english
+                left: (currLang =='ar')? 20:null,//arabic
                 child: GestureDetector(
 
                   child: Text(
-                    'Remove',
+                    'Remove'.tr,
                     //weight: 50,
                     style: TextStyle(
                       color: Colors.red.withOpacity(0.7),
@@ -446,10 +458,10 @@ Widget patientCard(ScUser user, List<dynamic> doctrPats) {
                   ),
                   onTap: () {
                     showNoHeader(
-                      txt: 'Are you sure you want to remove this patient ?',
+                      txt: 'Are you sure you want to remove this patient ?'.tr,
                       icon: Icons.close,
                       btnOkColor: Colors.red,
-                      btnOkText: 'remove',
+                      btnOkText: 'Remove'.tr,
                     ).then((toAllow) {// if admin accept
                       if (toAllow) {
                         removePatient(user);
@@ -539,18 +551,14 @@ Widget userCard(ScUser user) {
                             ),
                             SizedBox(height: 5),
 
-                            Text(
+                            (user.role == 'doctor')? Text(
+                              'Tax: F6KH-ZFG564-6FKDZ',
+                              style: TextStyle(color: Colors.white, fontSize: 13),
+                            ): Text(
                               'Tel: ${user.number!}',
                               style:
                               TextStyle(color: Colors.white, fontSize: 13),
                             ),
-                            // SizedBox(height: 5),
-                            //
-                            // if(user.role == 'doctor') Text(
-                            //   'Speciality: ${user.speciality!}',
-                            //   style:
-                            //   TextStyle(color: Colors.white, fontSize: 13),
-                            // ),
                           ],
                         ),
                       ],
@@ -562,7 +570,8 @@ Widget userCard(ScUser user) {
             !user.accepted?
               Positioned(
                 bottom: cardHei/3,
-                right: 25,
+                right: (currLang =='ar')? null:25,//english
+                left: (currLang =='ar')? 25:null,//arabic
                 child: CircleAvatar(
                   backgroundColor: Colors.greenAccent.withOpacity(0.7),
                   radius: 20,
@@ -572,10 +581,10 @@ Widget userCard(ScUser user) {
                     color: Colors.white,
                     onPressed: () {
                       showNoHeader(
-                        txt: 'Are you sure you want to accept this user ?',
+                        txt: 'Are you sure you want to accept this user ?'.tr,
                         icon: Icons.check,
                         btnOkColor: Colors.green,
-                        btnOkText: 'add',
+                        btnOkText: 'add'.tr,
                       ).then((toAllow) {// if admin accept
                         if (toAllow) {
 
@@ -588,7 +597,8 @@ Widget userCard(ScUser user) {
                 ),
               ):Positioned(
                 bottom: cardHei/3,
-                right: 25,
+              right: (currLang =='ar')? null:25,//english
+              left: (currLang =='ar')? 25:null,//arabic
                 child: CircleAvatar(
                   backgroundColor: Colors.red.withOpacity(0.6),
                   radius: 20,
@@ -598,17 +608,14 @@ Widget userCard(ScUser user) {
                     color: Colors.white,
                     onPressed: () {
                       showNoHeader(
-                        txt: 'Are you sure you want to remove this user ?',
+                        txt: 'Are you sure you want to remove this user ?'.tr,
                         icon: Icons.close,
                         btnOkColor: Colors.red,
-                        btnOkText: 'remove',
+                        btnOkText: 'Remove'.tr,
                       ).then((toAllow) {// if admin accept
                         if (toAllow) {
-
                           deleteUser(user.id!);// delete user from firestore
                           deleteUserFromAuth(user.email, user.pwd);// delete from auth
-
-
                         }
                       });
                       },
@@ -715,7 +722,9 @@ Widget appoiCard(String key, Map<String, dynamic> appoiInfo,) {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 4),
-                    Text("Topic: ${topic}",
+                    Text("${'Topic'.tr}: ${topic}",
+                      maxLines: 1,
+                     // overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         //color: cardColor.withOpacity(0.85),
                         color: Colors.white.withOpacity(0.80),
@@ -725,11 +734,10 @@ Widget appoiCard(String key, Map<String, dynamic> appoiInfo,) {
 
                     ),),
                     SizedBox(height: 4),
-                    Text("Time: ${time}",style: TextStyle(
+                    Text("${'Time'.tr}: ${time}",style: TextStyle(
                       color: !newAppoi? Colors.white: Colors.white.withOpacity(0.80),
                       fontSize: 15,
                         fontWeight: !newAppoi? FontWeight.w800 :FontWeight.w400
-
 
                     ),),
                   ],
@@ -740,7 +748,8 @@ Widget appoiCard(String key, Map<String, dynamic> appoiInfo,) {
           newAppoi
               ? Positioned(
               bottom: 15,
-              right: 10,
+              right: (currLang =='ar')? null:10,//english
+              left: (currLang =='ar')? 10:null,//arabic
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 GestureDetector(
                   // child: Icon(
@@ -750,7 +759,7 @@ Widget appoiCard(String key, Map<String, dynamic> appoiInfo,) {
                   //   color: cardColor,
                   // ),
                   child: Text(
-                    'Accept',
+                    'Accept'.tr,
                     //weight: 50,
                     style: TextStyle(
                 color: primaryColorMat[800],
@@ -776,7 +785,7 @@ Widget appoiCard(String key, Map<String, dynamic> appoiInfo,) {
                 SizedBox(width: 17),
                 GestureDetector(
                   child: Text(
-                    'Decline',
+                    'Decline'.tr,
                     //weight: 50,
                     style: TextStyle(
                         color: Colors.red,

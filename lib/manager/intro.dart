@@ -8,6 +8,8 @@ import 'package:smart_care/manager/auth/login.dart';
 import 'package:smart_care/manager/myLocale/myLocaleCtr.dart';
 import 'package:smart_care/manager/styles.dart';
 
+import 'loadingScreen.dart';
+
 
 
 class IntroScreen extends StatefulWidget {
@@ -22,7 +24,7 @@ class IntroScreenState extends State<IntroScreen> {
   MyLocaleCtr langGc = Get.find<MyLocaleCtr>();
 
   void _onIntroEnd(context) {
-    Get.offAll(Login());
+    Get.offAll(LoadingScreen());
     int introTimes = sharedPrefs!.getInt('intro') ?? 0;
     introTimes ++;
     sharedPrefs!.setInt('intro',introTimes);
@@ -76,7 +78,7 @@ class IntroScreenState extends State<IntroScreen> {
       //   height: 60,
       //   child: ElevatedButton(
       //     child: const Text(
-      //       'Let\'s go right away!',
+      //       'Let's go right away!',
       //       style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
       //     ),
       //     onPressed: () => _onIntroEnd(context),
@@ -95,7 +97,31 @@ class IntroScreenState extends State<IntroScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               SizedBox(
-                width: 130,
+                width:90,
+                child: ElevatedButton(
+
+                  onPressed: () {
+                    langGc.changeLang('fr');
+                    setState(() {
+
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+
+                    backgroundColor: primaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child:  Text(
+                    'French'.tr,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+
+              SizedBox(
+                width: 90,
                 child: ElevatedButton(
 
                   onPressed: () {
@@ -118,7 +144,7 @@ class IntroScreenState extends State<IntroScreen> {
                 ),
               ),
               SizedBox(
-                width: 130,
+                width: 90,
 
                 child: ElevatedButton(
                   onPressed: () {
@@ -170,7 +196,7 @@ class IntroScreenState extends State<IntroScreen> {
         ),
 
         // PageViewModel(
-        //   title: 'Let\'s Begin ... '.tr,
+        //   title: 'Let's Begin ... '.tr,
         //   bodyWidget: Row(
         //     mainAxisAlignment: MainAxisAlignment.center,
         //     children:  [
@@ -210,7 +236,7 @@ class IntroScreenState extends State<IntroScreen> {
       showBackButton: true,
       //rtl: true, // Display as right-to-left
       back: const Icon(Icons.arrow_back),
-      skip: const Text('Skip', style: TextStyle(fontWeight: FontWeight.w600)),
+      skip:  Text('Skip'.tr, style: TextStyle(fontWeight: FontWeight.w600)),
       next: const Icon(Icons.arrow_forward),
       done:  Text('Done'.tr, style: TextStyle(fontWeight: FontWeight.w600)),
       curve: Curves.fastLinearToSlowEaseIn,

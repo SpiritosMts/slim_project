@@ -2,7 +2,7 @@ name: smart_care
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.5.0+2
+version: 1.6.0+3
 
 environment:
   sdk: '>=2.19.6 <3.0.0'
@@ -58,13 +58,19 @@ dependencies:
   fl_chart: any
   awesome_notifications: any
   alarm: ^1.0.5
-
   flutter_datetime_picker: any
   simple_ripple_animation: any
   badges: ^3.1.1
   google_maps_flutter: ^2.2.6
   flutter_sparkline: ^0.1.0
   tflite_flutter: ^0.9.5
+
+  flutter_circle_chart: ^1.0.0
+  email_validator: ^2.1.17
+
+  circular_chart_flutter: ^0.0.2
+  percent_indicator: ^4.2.3
+  sleek_circular_slider: ^2.0.1
 
 
 

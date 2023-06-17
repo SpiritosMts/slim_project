@@ -9,6 +9,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ import 'package:smart_care/chart_live_history/chart_live_history_ctr.dart';
 import 'package:smart_care/manager/auth/authCtr.dart';
 import 'package:smart_care/manager/auth/login.dart';
 import 'package:smart_care/manager/auth/verifyEmail.dart';
+import 'package:smart_care/manager/myUi.dart';
 import 'package:smart_care/models/user.dart';
 
 import '../_doctor/home/doctorHome_ctr.dart';
@@ -55,7 +57,7 @@ FirebaseAuth get fbAuth => FirebaseAuth.instance;
 
 int refreshVerifInSec =5;
 int introShowTimes =1;
-bool verifyAnyCreatedAccount =true;
+bool verifyAnyCreatedAccount =false;
 bool showLiveTime =false;
 
 
@@ -423,7 +425,7 @@ showShouldVerify({bool isLoadingScreen =false}) {
     title: 'Verification'.tr,
     desc: 'Your email is not verified\nVerify now?'.tr,
     btnOkText: 'Verify'.tr,
-    btnCancelText: 'Cancel'.tr,
+    btnCancelText: 'cancel'.tr,
     btnOkColor: Colors.blue,
     btnOkIcon: Icons.send,
     btnOkOnPress: () {
@@ -447,6 +449,50 @@ showShouldVerify({bool isLoadingScreen =false}) {
   ).show();
 }
 
+
+
+
+showChangeProp({title,body, Function()? btnOkPress,icon}) {
+  return AwesomeDialog(
+    dialogBackgroundColor: primaryColor,
+
+    customHeader: icon,
+    autoDismiss: false  ,
+    context: navigatorKey.currentContext!,
+
+    showCloseIcon: false,
+    dismissOnTouchOutside: true,
+    animType: AnimType.scale,
+    headerAnimationLoop: false,
+dismissOnBackKeyPress: true,
+
+     btnCancelOnPress: (){
+      Get.back();
+     },
+    dialogType: DialogType.noHeader,
+    title: title,
+    titleTextStyle: TextStyle(
+      color: Colors.blueAccent
+    ),
+    body: body,
+    //desc: 'Your email is not verified\nVerify now?'.tr,
+    btnOkText: 'Change'.tr,
+    btnCancelText: 'cancel'.tr,
+    btnCancelColor: Colors.grey,
+
+    btnOkColor: accentColor0,
+
+    btnOkIcon: Icons.check,
+    btnOkOnPress: () {
+      btnOkPress!();
+    },
+    onDismissCallback: (type) {
+      print('## Dialog Dissmiss from callback $type');
+      //Get.back();
+    },
+    padding: EdgeInsets.symmetric(vertical: 20.0),
+  ).show();
+}
 
 
 
@@ -585,7 +631,7 @@ removePatient(ScUser patient) async {
 
   //remove patient to doctor
   removeElementsFromList([patID], 'patients', dctrID, 'sc_users').then((value) {
-    showSnack("${patient.name} removed from my patients list",color: Colors.redAccent.withOpacity(0.8));
+    showSnack("${patient.name} ${'removed from my patients list'.tr}",color: Colors.redAccent.withOpacity(0.8));
 
   });
 
@@ -603,7 +649,7 @@ addPatient(ScUser patient) async {
 
   //add patient to doctor
   await addElementsToList([patID], 'patients', dctrID, 'sc_users').then((value) {
-    showSnack("${patient.name} added to my patients list");
+    showSnack("${patient.name} ${'added to my patients list'.tr}");
 
   });
 
